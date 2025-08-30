@@ -1,0 +1,120 @@
+[
+  {
+    "token0": "GALA",
+    "token1": "GUSDC",
+    "token0Full": "GALA$Unit$none$none",
+    "token1Full": "GUSDC$Unit$none$none",
+    "fee": 10000,
+    "feeName": "1%",
+    "liquidity": "211792980647.0244325467902178",
+    "sqrtPrice": "0.13431022350313052021",
+    "tickSpacing": 200,
+    "testQuote": {
+      "success": true,
+      "amountIn": "100",
+      "amountOut": "1.785882",
+      "rate": 0.01785882
+    }
+  },
+  {
+    "token0": "GALA",
+    "token1": "GOSMI",
+    "token0Full": "GALA$Unit$none$none",
+    "token1Full": "GOSMI$Unit$none$none",
+    "fee": 10000,
+    "feeName": "1%",
+    "liquidity": "168294775922.903779495812165",
+    "sqrtPrice": "1.09765329099626364502",
+    "tickSpacing": 200,
+    "testQuote": {
+      "success": true,
+      "amountIn": "100",
+      "amountOut": "119.268071356049890595",
+      "rate": 1.1926807135604989
+    }
+  },
+  {
+    "token0": "GALA",
+    "token1": "SILK",
+    "token0Full": "GALA$Unit$none$none",
+    "token1Full": "SILK$Unit$none$none",
+    "fee": 10000,
+    "feeName": "1%",
+    "liquidity": "342099979.5511118435367032",
+    "sqrtPrice": "6.23210272592339879357",
+    "tickSpacing": 200
+  },
+  {
+    "token0": "GALA",
+    "token1": "SILK",
+    "token0Full": "GALA$Unit$none$none",
+    "token1Full": "SILK$Unit$none$none",
+    "fee": 3000,
+    "feeName": "0.3%",
+    "liquidity": "24867288.24453253285010664",
+    "sqrtPrice": "5.56286563919627067851",
+    "tickSpacing": 60,
+    "testQuote": {
+      "success": true,
+      "amountIn": "100",
+      "amountOut": "76.1360635",
+      "rate": 0.7613606350000001
+    }
+  },
+  {
+    "token0": "ETIME",
+    "token1": "SILK",
+    "token0Full": "ETIME$Unit$none$none",
+    "token1Full": "SILK$Unit$none$none",
+    "fee": 500,
+    "feeName": "0.05%",
+    "liquidity": "12752822.6394261677455752",
+    "sqrtPrice": "1.63527908019369979968",
+    "tickSpacing": 10,
+    "testQuote": {
+      "success": true,
+      "amountIn": "100",
+      "amountOut": "249.75702395",
+      "rate": 2.4975702395
+    }
+  },
+  {
+    "token0": "GALA",
+    "token1": "GUSDC",
+    "token0Full": "GALA$Unit$none$none",
+    "token1Full": "GUSDC$Unit$none$none",
+    "fee": 500,
+    "feeName": "0.05%",
+    "liquidity": "224283.5677272540531813716",
+    "sqrtPrice": "0.13394675993630522106",
+    "tickSpacing": 10,
+    "testQuote": {
+      "success": true,
+      "amountIn": "100",
+      "amountOut": "1.793251",
+      "rate": 0.01793251
+    }
+  },
+  {
+    "token0": "GUSDC",
+    "token1": "SILK",
+    "token0Full": "GUSDC$Unit$none$none",
+    "token1Full": "SILK$Unit$none$none",
+    "fee": 10000,
+    "feeName": "1%",
+    "liquidity": "1552.0467475665111036",
+    "sqrtPrice": "7.65937753448068092827",
+    "tickSpacing": 200
+  },
+  {
+    "token0": "GALA",
+    "token1": "SILK",
+    "token0Full": "GALA$Unit$none$none",
+    "token1Full": "SILK$Unit$none$none",
+    "fee": 500,
+    "feeName": "0.05%",
+    "liquidity": "56.77360766962020678",
+    "sqrtPrice": "0.1",
+    "tickSpacing": 10
+  }
+]

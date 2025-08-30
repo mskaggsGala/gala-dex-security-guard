@@ -1,0 +1,33 @@
+{
+  "name": "galaswap-trading-bot",
+  "version": "1.0.0",
+  "description": "Automated trading bot for GalaSwap V3",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js trade",
+    "trade": "node index.js trade",
+    "discover": "node index.js discover",
+    "arbitrage": "node index.js arbitrage",
+    "help": "node index.js help",
+    "dev": "nodemon index.js trade",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "discover-verbose": "node index.js discover-verbose"
+  },
+  "keywords": [
+    "galaswap",
+    "trading",
+    "bot",
+    "defi",
+    "arbitrage"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "dotenv": "^17.2.1",
+    "ethers": "^6.13.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

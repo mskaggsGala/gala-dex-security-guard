@@ -1,0 +1,192 @@
+
+╔════════════════════════════════════════╗
+║       GalaSwap Trading Bot v1.0       ║
+╚════════════════════════════════════════╝
+    
+💰 Starting trading bot...
+
+
+🤖 GalaSwap Trading Bot Starting...
+Mode: SIMULATION
+Check Interval: 5s
+Target Pairs: GALA/GUSDC-1%, GALA/GOSMI-1%
+
+💼 Current Balance:
+   GALA: 10000.000000
+   GUSDC: 100.000000
+   SILK: 100.000000
+   GOSMI: 100.000000
+
+⏰ [9:03:27 PM] Iteration 1
+
+--- Fetching Multiple Token Prices ---
+Prices received: {
+  status: 200,
+  message: 'Price fetched successfully',
+  error: false,
+  data: [ '0.018039', '1', '0.017046', '0.014972081376' ]
+}
+📊 Prices: GALA=$0.018039, GUSDC=$1
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '0.13431022350313052',
+    newSqrtPrice: '0.134310108978891936',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '1.785882'
+  }
+}
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '1.097653290996263645',
+    newSqrtPrice: '1.097548746382389546',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '119.268071356049890595'
+  }
+}
+💤 No profitable opportunities
+
+⏰ [9:03:40 PM] Iteration 2
+
+--- Fetching Multiple Token Prices ---
+Prices received: {
+  status: 200,
+  message: 'Price fetched successfully',
+  error: false,
+  data: [ '0.018039', '1', '0.017046', '0.014972081376' ]
+}
+📊 Prices: GALA=$0.018039, GUSDC=$1
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '0.13431022350313052',
+    newSqrtPrice: '0.134310108978891936',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '1.785882'
+  }
+}
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '1.097653290996263645',
+    newSqrtPrice: '1.097548746382389546',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '119.268071356049890595'
+  }
+}
+💤 No profitable opportunities
+
+⏰ [9:03:46 PM] Iteration 3
+
+--- Fetching Multiple Token Prices ---
+Prices received: {
+  status: 200,
+  message: 'Price fetched successfully',
+  error: false,
+  data: [ '0.018039', '1', '0.017046', '0.014972081376' ]
+}
+📊 Prices: GALA=$0.018039, GUSDC=$1
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '0.13431022350313052',
+    newSqrtPrice: '0.134310108978891936',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '1.785882'
+  }
+}
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '1.097653290996263645',
+    newSqrtPrice: '1.097548746382389546',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '119.268071356049890595'
+  }
+}
+💤 No profitable opportunities
+
+⏰ [9:03:55 PM] Iteration 4
+
+--- Fetching Multiple Token Prices ---
+Prices received: {
+  status: 200,
+  message: 'Price fetched successfully',
+  error: false,
+  data: [ '0.018039', '1', '0.017046', '0.014972081376' ]
+}
+📊 Prices: GALA=$0.018039, GUSDC=$1
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '0.13431022350313052',
+    newSqrtPrice: '0.134310108978891936',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '1.785882'
+  }
+}
+
+--- Getting Swap Quote ---
+Quote received: {
+  status: 200,
+  message: 'Quoted value retrieved successfully.',
+  error: false,
+  data: {
+    currentSqrtPrice: '1.097653290996263645',
+    newSqrtPrice: '1.097548746382389546',
+    fee: 10000,
+    amountIn: '100',
+    amountOut: '119.268071356049890595'
+  }
+}
+💤 No profitable opportunities
+^C
+🛑 Stopping bot...
+
+📈 Trading Statistics:
+   Total Trades: 0
+   Successful: 0
+   Failed: 0
+   Total Profit: 0.000000 GALA
+
+💼 Current Balance:
+   GALA: 10000.000000
+   GUSDC: 100.000000
+   SILK: 100.000000
+   GOSMI: 100.000000
