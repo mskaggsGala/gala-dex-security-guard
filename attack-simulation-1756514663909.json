@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-08-30T00:44:23.909Z",
+  "attacks": [
+    {
+      "type": "Sandwich Attack",
+      "result": "Protected",
+      "details": "Potential profit: -1034.0573577999967 GALA",
+      "severity": "INFO"
+    },
+    {
+      "type": "Oracle Manipulation",
+      "result": "Protected",
+      "details": "Price variations found: 1",
+      "severity": "INFO"
+    },
+    {
+      "type": "DoS - Connection Flood",
+      "result": 50,
+      "severity": "INFO"
+    },
+    {
+      "type": "DoS - Large Payload",
+      "result": "Rejected",
+      "severity": "INFO"
+    },
+    {
+      "type": "DoS - Recursive Request",
+      "result": "Blocked",
+      "severity": "INFO"
+    },
+    {
+      "type": "Reentrancy Test",
+      "result": "Protected",
+      "details": "Price consistency: true",
+      "severity": "INFO"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "info": 6
+  },
+  "recommendations": []
+}

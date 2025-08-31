@@ -1,0 +1,145 @@
+{
+  "timestamp": "2025-08-30T00:41:30.259Z",
+  "totalTests": 22,
+  "criticalIssues": 2,
+  "results": [
+    {
+      "timestamp": "2025-08-30T00:41:22.408Z",
+      "test": "Input validation - Zero amount",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:22.756Z",
+      "test": "Input validation - Negative amount",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:23.141Z",
+      "test": "Input validation - Dust amount",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:23.589Z",
+      "test": "Input validation - Extremely large amount",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:23.963Z",
+      "test": "Input validation - Not a number",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:24.348Z",
+      "test": "Input validation - Null value",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:24.802Z",
+      "test": "Input validation - Scientific notation overflow",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:25.178Z",
+      "test": "Input validation - Hex value",
+      "result": "Accepted value: 0x1234, Response: 200",
+      "severity": "medium"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:25.544Z",
+      "test": "Input validation - Path traversal attempt",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:25.940Z",
+      "test": "Input validation - SQL injection attempt",
+      "result": "Properly rejected with 400",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:26.388Z",
+      "test": "Rate limiting test",
+      "result": "100 requests in 345ms: 100 success, 0 rate limited, 0 errors",
+      "severity": "high"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:26.388Z",
+      "test": "Rate limiting",
+      "result": "No rate limiting detected - vulnerable to DoS attacks",
+      "severity": "critical"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:26.660Z",
+      "test": "Token validation",
+      "result": "Properly rejected invalid token",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:27.039Z",
+      "test": "Token validation",
+      "result": "Properly rejected invalid token",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:27.421Z",
+      "test": "Token validation",
+      "result": "Properly rejected invalid token",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:27.797Z",
+      "test": "Token validation",
+      "result": "Properly rejected invalid token",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:28.174Z",
+      "test": "Token validation",
+      "result": "Properly rejected invalid token",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:28.540Z",
+      "test": "Slippage protection",
+      "result": "Test case: Zero price limit - Needs swap endpoint",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:28.540Z",
+      "test": "Slippage protection",
+      "result": "Test case: Extreme price limit - Needs swap endpoint",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:28.540Z",
+      "test": "Slippage protection",
+      "result": "Test case: Negative minimum - Needs swap endpoint",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:28.540Z",
+      "test": "Slippage protection",
+      "result": "Test case: Impossible minimum - Needs swap endpoint",
+      "severity": "info"
+    },
+    {
+      "timestamp": "2025-08-30T00:41:28.844Z",
+      "test": "Concurrency test",
+      "result": "Consistent quotes in parallel requests",
+      "severity": "info"
+    }
+  ],
+  "summary": {
+    "critical": 1,
+    "high": 1,
+    "medium": 1,
+    "info": 19
+  }
+}
