@@ -82,6 +82,81 @@ class SecurityMonitor {
     }
 
 
+     async runPhase2Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 2 ECONOMIC ATTACKS');
+        console.log('========================================\n');
+        
+        const MEVTester = require('./mev-tester');
+        const CrossPoolArbitrage = require('./cross-pool-arbitrage');
+        const FlashLoanTester = require('./flash-loan-tester');
+        
+        const results = {
+            timestamp: new Date().toISOString(),
+            phase: 'Phase 2 - Economic Attack Vectors',
+            tests: []
+        };
+
+        // Test 1: MEV Testing
+        console.log('[1/3] Running MEV Tests...');
+        const mevTester = new MEVTester();
+        const mevResults = await mevTester.testMEVVulnerabilities();
+        
+        results.tests.push({
+            test: 'MEV Vulnerabilities',
+            timestamp: mevResults.timestamp,
+            passed: !mevResults.attacks.some(a => a.vulnerable),
+            severity: mevResults.attacks.some(a => a.vulnerable) ? 'HIGH' : 'PASS',
+            details: mevResults.attacks,
+            recommendation: mevResults.attacks.some(a => a.vulnerable) ? 
+                'Implement MEV protection mechanisms' : 
+                'DEX appears protected against common MEV attacks'
+        });
+
+        // Test 2: Cross-Pool Arbitrage
+        console.log('\n[2/3] Running Cross-Pool Arbitrage Tests...');
+        const arbTester = new CrossPoolArbitrage();
+        const arbResults = await arbTester.testCrossPoolArbitrage();
+        
+        const hasArbitrage = arbResults.arbitrageOpportunities.some(a => a.profitable);
+        results.tests.push({
+            test: 'Cross-Pool Arbitrage',
+            timestamp: arbResults.timestamp,
+            passed: !hasArbitrage,
+            severity: hasArbitrage ? 'MEDIUM' : 'PASS',
+            details: arbResults.arbitrageOpportunities,
+            recommendation: hasArbitrage ? 
+                'Price discrepancies detected between pools - review pricing mechanism' : 
+                'Pool pricing appears consistent'
+        });
+
+        // Test 3: Flash Loan Attacks
+        console.log('\n[3/3] Running Flash Loan Attack Tests...');
+        const flashTester = new FlashLoanTester();
+        const flashResults = await flashTester.testFlashLoanVulnerabilities();
+        
+        const hasFlashRisk = flashResults.flashLoanRisks.some(r => r.vulnerable);
+        results.tests.push({
+            test: 'Flash Loan Attacks',
+            timestamp: flashResults.timestamp,
+            passed: !hasFlashRisk,
+            severity: hasFlashRisk ? 'HIGH' : 'PASS',
+            details: flashResults.flashLoanRisks,
+            recommendation: hasFlashRisk ? 
+                'Implement flash loan protection mechanisms' : 
+                'DEX appears resistant to flash loan attacks'
+        });
+
+        // Save and return
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+
+
+
 
     // Rate limiting test
     async testRateLimiting() {
