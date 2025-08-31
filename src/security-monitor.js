@@ -2,6 +2,11 @@ const SecurityTester = require('./security-tester');
 const AttackSimulator = require('./attack-simulator');
 const fs = require('fs');
 const path = require('path');
+const Phase4BMonitor = require('./phase4b-integration');
+const Phase4CMonitor = require('./phase4c-integration');
+
+
+
 
 class SecurityMonitor {
     constructor() {
@@ -155,6 +160,54 @@ class SecurityMonitor {
     }
 
 
+    // Add this method to the SecurityMonitor class
+    async runPhase4BTests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 4B EXTENDED SURFACE');
+        console.log('========================================\n');
+        
+        const phase4b = new Phase4BMonitor();
+        const phase4bResults = await phase4b.runAllPhase4BTests();
+        
+        // Convert to standard format for our system
+        const results = {
+            timestamp: phase4bResults.timestamp,
+            phase: 'Phase 4B - Extended Attack Surface',
+            tests: phase4bResults.tests.map(test => ({
+                test: `${test.category}: ${test.test}`,
+                timestamp: new Date().toISOString(),
+                passed: test.passed,
+                severity: test.severity,
+                details: test.details,
+                recommendation: test.recommendation
+            }))
+        };
+        
+        // Save in standard format
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+
+    // Add method to SecurityMonitor class
+    async runPhase4CTests() {
+        const phase4c = new Phase4CMonitor();
+        const results = await phase4c.runPhase4CTests();
+        
+        // Convert to standard format
+        const standardResults = {
+            timestamp: results.timestamp,
+            phase: results.phase,
+            tests: results.tests
+        };
+        
+        this.saveResults(standardResults);
+        this.printSummary(standardResults);
+        
+        return standardResults;
+    }
 
 
 

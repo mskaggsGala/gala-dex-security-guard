@@ -11,6 +11,8 @@ class SecurityScheduler {
     }
 
     // Schedule different tests at different intervals
+ 
+
     setupSchedules() {
         console.log('Setting up automated security monitoring...\n');
 
@@ -32,16 +34,56 @@ class SecurityScheduler {
             await this.monitor.runPhase2Tests();
         }, { scheduled: false });
 
+        // Phase 4B - every 12 hours (NEW)
+        const phase4bJob = cron.schedule('0 */12 * * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 4B tests...`);
+            await this.monitor.runPhase4BTests();
+        }, { scheduled: false });
+
+
+
+        const phase4cJob = cron.schedule('0 2 * * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 4C performance tests...`);
+            await this.monitor.runPhase4CTests();
+        }, { scheduled: false });
+
+
         // Generate report - daily at 9 AM
         const reportJob = cron.schedule('0 9 * * *', async () => {
             console.log(`[${new Date().toISOString()}] Generating daily report...`);
             await this.reportGen.generateFromLatest();
         }, { scheduled: false });
 
-        this.runningJobs = [criticalJob, phase1Job, phase2Job, reportJob];
+        this.runningJobs = [criticalJob, phase1Job, phase2Job, phase4bJob, phase4cJob, reportJob];
         
         return this.runningJobs;
     }
+
+
+    // Add this method to the SecurityScheduler class
+    showSchedule() {
+        console.log('\n📅 Scheduled Security Tests:');
+        console.log('================================');
+        console.log('• Every 5 minutes:  Critical tests (rate limiting)');
+        console.log('• Every hour:       Phase 1 (infrastructure)');
+        console.log('• Every 6 hours:    Phase 2 (economic attacks)');
+        console.log('• Every 12 hours:   Phase 4B (extended surface)');
+        console.log('• Daily at 2 AM:    Phase 4C (performance)');
+        console.log('• Daily at 9 AM:    Generate reports');
+        console.log('================================\n');
+        
+        // Show next run times (if you want to calculate them)
+        const now = new Date();
+        console.log('Current time:', now.toLocaleString());
+        console.log('\nNext run times:');
+        console.log('• Critical tests: ~' + new Date(now.getTime() + 5*60*1000).toLocaleTimeString());
+        console.log('• Phase 1: Next hour at :00');
+        console.log('• Phase 2: Next interval at 0:00, 6:00, 12:00, or 18:00');
+        console.log('• Phase 4B: Next interval at 0:00 or 12:00');
+        console.log('• Phase 4C: Tomorrow at 2:00 AM');
+        console.log('• Report: Tomorrow at 9:00 AM\n');
+    }
+
 
     // Run only critical tests (rate limiting)
     async runCriticalTests() {
@@ -85,12 +127,10 @@ class SecurityScheduler {
     start() {
         const jobs = this.setupSchedules();
         jobs.forEach(job => job.start());
-        
-        console.log('✅ Security monitoring scheduled:');
-        console.log('  - Critical tests: Every 5 minutes');
-        console.log('  - Phase 1 tests: Every hour');
-        console.log('  - Phase 2 tests: Every 6 hours');
-        console.log('  - Daily report: 9 AM daily\n');
+
+        // Show the schedule when starting
+        this.showSchedule();  // Add this line
+    
         console.log('Press Ctrl+C to stop monitoring.\n');
     }
 

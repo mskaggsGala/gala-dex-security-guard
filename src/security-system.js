@@ -36,7 +36,9 @@ class SecuritySystem {
         };
     }
 
-    // Run initial comprehensive test
+
+
+    // Update the runInitialTests method to include Phase 4C
     async runInitialTests() {
         console.log('\n🔍 Running initial security assessment...\n');
         
@@ -48,14 +50,31 @@ class SecuritySystem {
         console.log('\nPhase 2: Economic Attack Tests');
         const phase2Results = await this.monitor.runPhase2Tests();
         
+        // Run Phase 4B
+        console.log('\nPhase 4B: Extended Attack Surface Tests');
+        const phase4bResults = await this.monitor.runPhase4BTests();
+        
+        // Run Phase 4C (NEW)
+        console.log('\nPhase 4C: Performance & Load Tests');
+        const phase4cResults = await this.monitor.runPhase4CTests();
+        
         // Generate report
         console.log('\n📊 Generating comprehensive report...');
         const report = await this.reportGen.generateFromLatest();
         
-        // Check for critical issues
-        const allTests = [...(phase1Results.tests || []), ...(phase2Results.tests || [])];
-        const criticalIssues = allTests.filter(t => t.severity === 'CRITICAL');
+        // Check for issues
+        const allTests = [
+            ...(phase1Results.tests || []), 
+            ...(phase2Results.tests || []),
+            ...(phase4bResults.tests || []),
+            ...(phase4cResults.tests || [])
+        ];
         
+        const criticalIssues = allTests.filter(t => t.severity === 'CRITICAL');
+        const highIssues = allTests.filter(t => t.severity === 'HIGH');
+        const mediumIssues = allTests.filter(t => t.severity === 'MEDIUM');
+        
+        // Alert for all severity levels
         if (criticalIssues.length > 0) {
             console.log('\n⚠️  CRITICAL ISSUES DETECTED:');
             criticalIssues.forEach(issue => {
@@ -64,8 +83,26 @@ class SecuritySystem {
             });
         }
         
-        return { phase1Results, phase2Results, criticalIssues };
+        if (highIssues.length > 0) {
+            console.log('\n⚠️  HIGH SEVERITY ISSUES:');
+            highIssues.forEach(issue => {
+                console.log(`  - ${issue.test}: ${issue.recommendation}`);
+                this.alertManager.sendAlert('HIGH', issue.test, issue);
+            });
+        }
+        
+        if (mediumIssues.length > 0) {
+            console.log('\n⚠️  MEDIUM SEVERITY ISSUES:');
+            mediumIssues.forEach(issue => {
+                console.log(`  - ${issue.test}: ${issue.recommendation}`);
+                this.alertManager.sendAlert('MEDIUM', issue.test, issue);
+            });
+        }
+        
+        return { phase1Results, phase2Results, phase4bResults, phase4cResults, criticalIssues, highIssues, mediumIssues };
     }
+
+
 
     // Start the complete system
     async start() {
