@@ -9,7 +9,7 @@ const { performance } = require('perf_hooks');
 class ComprehensiveTestRunner {
     constructor() {
         this.baseURL = 'https://dex-backend-prod1.defi.gala.com';
-        this.resultsDir = './security-results';
+        this.resultsDir = '../security-results';
         this.allResults = {
             timestamp: new Date().toISOString(),
             summary: {

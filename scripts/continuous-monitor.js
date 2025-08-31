@@ -9,7 +9,7 @@ class ContinuousMonitor {
     constructor(intervalMinutes = 5) {
         this.intervalMinutes = intervalMinutes;
         this.runCount = 0;
-        this.resultsDir = './security-results';
+        this.resultsDir = '../security-results';
         this.baseURL = 'https://dex-backend-prod1.defi.gala.com';
         this.running = false;
         
