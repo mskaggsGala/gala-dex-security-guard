@@ -1,135 +1,221 @@
-# GalaSwap Trading Bot
+Here's an updated README that reflects your current security monitoring system:
 
-An automated trading bot for GalaSwap V3 protocol with arbitrage detection and pool discovery capabilities.
+```markdown
+# GalaSwap Security Monitor & Trading Bot
 
-## Features
+A comprehensive security monitoring system and automated trading bot for the GalaSwap DEX, featuring multi-phase vulnerability testing, real-time monitoring, and automated security assessments.
 
-- 🔍 **Pool Discovery**: Automatically find active trading pools with liquidity
-- 📊 **Arbitrage Detection**: Monitor for profitable opportunities across different fee tiers
-- 🤖 **Automated Trading**: Execute trades based on configurable strategies
-- 🧪 **Simulation Mode**: Test strategies without risking real funds
-- 📈 **Real-time Monitoring**: Track price movements and market conditions
-- 💰 **Risk Management**: Built-in safety features and position limits
+## 🛡️ Security Monitoring Features
+
+### Four-Phase Security Testing
+- **Phase 1: Infrastructure** - Rate limiting, liquidity drain protection, precision handling
+- **Phase 2: Economic Security** - MEV vulnerability testing, cross-pool arbitrage detection, flash loan attack simulation
+- **Phase 4B: Extended Attack Surface** - Bridge security, pool creation validation, advanced endpoint testing
+- **Phase 4C: Performance & Load** - Rate limit detection, concurrent load handling, performance degradation analysis
+
+### Real-Time Dashboard
+- Live security score and test results at http://localhost:3000
+- Critical issue alerts and recommendations
+- Auto-refreshing status display
+- Historical test result tracking
+
+### Automated Scheduling
+- Critical tests every 5 minutes
+- Infrastructure tests hourly
+- Economic security tests every 6 hours
+- Extended surface tests every 12 hours
+- Performance tests daily at 2 AM
+- Automated report generation daily at 9 AM
+
+## 🚨 Current Security Findings
+
+| Severity | Issue | Impact | Status |
+|----------|-------|--------|--------|
+| CRITICAL | No API Rate Limiting | 300+ requests/second allowed | OPEN |
+| HIGH | Pool Creation Without Auth | Unauthorized pool creation possible | OPEN |
+| MEDIUM | Replay Attack Protection | Potential replay vulnerabilities | OPEN |
+| LOW | Precision/Rounding | Mathematical precision issues | OPEN |
+
+**Overall Security Score: 0/10** (80% tests passing)
 
 ## Installation
 
-Clone the repository and install dependencies:
-
-    git clone [your-repo-url]
-    cd galaswap-trading-bot
-    npm install
+```bash
+git clone https://github.com/mskaggsGala/galaswap-security-monitor.git
+cd galaswap-security-monitor
+npm install
+```
 
 ## Configuration
 
-### 1. Environment Variables
+### Environment Setup
+```bash
+cp .env.example .env
+# Edit .env with your credentials (keep these secret!)
+```
 
-Copy the example environment file and update with your values:
-
-    cp .env.example .env
-
-Edit .env with your wallet credentials (keep these secret!)
-
-### 2. Trading Configuration
-
-Edit src/trading-config.js to customize:
-- Target trading pairs
-- Minimum profit thresholds
-- Trade sizes
-- Risk parameters
+### Required Environment Variables
+- `PRIVATE_KEY` - Your wallet private key
+- `WALLET_ADDRESS` - Your wallet address
+- `GALASWAP_API_URL` - GalaSwap API endpoint (optional)
+- `CHECK_INTERVAL_MS` - Bot check interval (default: 10000)
 
 ## Usage
 
-### Discover Active Pools
+### Security Monitoring
 
-Find all pools with liquidity:
+#### Run All Tests Immediately
+```bash
+node src/test-all-phases.js
+```
 
-    npm run discover
+#### Start Automated Monitoring
+```bash
+node src/scheduler.js
+```
 
-### Monitor for Arbitrage
+#### View Live Dashboard
+```bash
+node src/dashboard.js
+# Open http://localhost:3000 in your browser
+```
 
-Watch for profitable opportunities:
+#### Run Individual Test Phases
+```bash
+# Phase 1: Infrastructure
+node -e "const m = new (require('./src/security-monitor'))(); m.runBasicTests()"
 
-    npm run arbitrage
+# Phase 2: Economic Security
+node -e "const m = new (require('./src/security-monitor'))(); m.runPhase2Tests()"
 
-### Run Trading Bot
+# Phase 4B: Extended Surface
+node -e "const m = new (require('./src/security-monitor'))(); m.runPhase4BTests()"
 
-Start automated trading (simulation mode by default):
+# Phase 4C: Performance
+node -e "const m = new (require('./src/security-monitor'))(); m.runPhase4CTests()"
+```
 
-    npm run trade
+### Trading Bot Features
 
-### Other Commands
+#### Pool Discovery
+```bash
+npm run discover          # Find active trading pools
+npm run discover-verbose  # Detailed pool information
+```
 
-    npm run help              # Show all available commands
-    npm run discover-verbose  # Detailed pool discovery
-    npm run dev              # Run with auto-restart on changes
+#### Arbitrage Detection
+```bash
+npm run arbitrage  # Monitor for profitable opportunities
+```
 
-## Current Active Pools
-
-Based on the latest discovery, these pools have significant liquidity:
-
-| Pair | Fee | Liquidity | Exchange Rate |
-|------|-----|-----------|---------------|
-| GALA/GUSDC | 1% | $211B | 1 GALA = 0.0179 GUSDC |
-| GALA/GOSMI | 1% | $168B | 1 GALA = 1.1927 GOSMI |
-| GALA/SILK | 0.3% | $24M | 1 GALA = 0.7614 SILK |
-| ETIME/SILK | 0.05% | $12M | 1 ETIME = 2.4976 SILK |
-
-### Arbitrage Opportunities
-
-The GALA/GUSDC pair has different rates at different fee tiers:
-- 1% fee pool: 1 GALA = 0.017859 GUSDC
-- 0.05% fee pool: 1 GALA = 0.017933 GUSDC
-
-## Safety Features
-
-- **Dry Run Mode**: Test strategies without real trades
-- **Slippage Protection**: Maximum acceptable price deviation
-- **Position Limits**: Maximum percentage of wallet per trade
-- **Daily Loss Limits**: Stop trading if losses exceed threshold
-- **Trade Cooldowns**: Prevent rapid-fire trading
+#### Automated Trading
+```bash
+npm run trade  # Start trading bot (simulation mode by default)
+```
 
 ## Project Structure
 
-    galaswap-trading-bot/
-    ├── src/
-    │   ├── config.js              # Environment configuration
-    │   ├── trading-config.js      # Trading parameters
-    │   ├── galaswap-connection.js # API connection handler
-    │   ├── pool-discovery.js      # Pool discovery logic
-    │   ├── pool-discovery-clean.js # Clean discovery output
-    │   ├── arbitrage-detector.js  # Arbitrage detection
-    │   └── trading-bot.js         # Main bot logic
-    ├── index.js                   # Entry point
-    ├── .env                       # Your credentials (git-ignored)
-    ├── .env.example              # Example environment file
-    └── package.json              # Dependencies
+```
+galaswap-security-monitor/
+├── src/
+│   ├── config.js                    # Central configuration
+│   ├── dashboard.js                 # Live monitoring dashboard
+│   ├── scheduler.js                 # Automated test scheduler
+│   ├── security-monitor.js          # Core security test orchestrator
+│   ├── test-all-phases.js          # Manual test runner
+│   │
+│   ├── Security Testers/
+│   ├── enhanced-performance-tester.js  # Phase 4C with rate limit detection
+│   ├── extended-security-tester.js     # Phase 4B extended surface
+│   ├── mev-tester.js                   # MEV vulnerability testing
+│   ├── flash-loan-tester.js           # Flash loan attack simulation
+│   ├── cross-pool-arbitrage.js        # Arbitrage opportunity detection
+│   ├── bridge-security-tester.js      # Bridge endpoint security
+│   │
+│   ├── Integration/
+│   ├── phase4b-integration.js         # Phase 4B scheduler integration
+│   ├── phase4c-integration.js         # Phase 4C scheduler integration
+│   │
+│   └── Trading/
+│       ├── trading-bot.js             # Main trading logic
+│       ├── pool-discovery.js          # Pool discovery engine
+│       └── arbitrage-detector.js      # Arbitrage detection
+│
+├── security-results/        # Test results and reports
+├── security-reports/        # Generated security reports
+├── security-alerts.log      # Critical alert log
+└── dashboard/              # Dashboard HTML and assets
+```
+
+## Monitoring Schedule
+
+| Test Suite | Frequency | Coverage |
+|------------|-----------|----------|
+| Critical Tests | 5 minutes | Rate limiting |
+| Phase 1 | Hourly | Infrastructure security |
+| Phase 2 | 6 hours | Economic attack vectors |
+| Phase 4B | 12 hours | Extended attack surface |
+| Phase 4C | Daily 2 AM | Performance & load testing |
+| Reports | Daily 9 AM | Comprehensive security report |
+
+## Test Results Format
+
+Test results are saved in `security-results/` with naming convention:
+- `security-[timestamp].json` - General test results
+- `security-Phase-[X]-[timestamp].json` - Phase-specific results
+- `latest-Phase-[X].json` - Most recent results for each phase
+
+## Safety Features
+
+- **Dry Run Mode**: Test strategies without real transactions
+- **Rate Limit Detection**: Identifies missing API throttling
+- **Slippage Protection**: Maximum acceptable price deviation
+- **Position Limits**: Maximum percentage of wallet per trade
+- **Automated Alerts**: Critical issues logged to `security-alerts.log`
+
+## Development
+
+### Adding New Tests
+1. Create test module in `src/`
+2. Add to appropriate phase in `security-monitor.js`
+3. Update scheduler if needed
+4. Test with `test-all-phases.js`
+
+### Dashboard Customization
+Edit `src/dashboard.js` to modify:
+- Display format
+- Alert thresholds
+- Refresh intervals
+- Test categorization
 
 ## Risk Warning
 
-⚠️ **IMPORTANT**: Cryptocurrency trading carries significant risk. This bot is provided as-is with no guarantees. Always:
+⚠️ **IMPORTANT**: 
+- This system identifies security vulnerabilities in the GalaSwap DEX
+- Trading features carry significant financial risk
+- Always start with simulation mode
+- Never invest more than you can afford to lose
+- Keep private keys secure and never commit them to git
 
-1. Start with simulation mode
-2. Test with small amounts
-3. Monitor the bot closely
-4. Never invest more than you can afford to lose
-5. Keep your private keys secure
+## Current Status
 
-## Going Live
+✅ All systems operational
+- 4 test phases running
+- Dashboard active
+- Scheduler configured
+- 80% tests passing
+- 1 critical issue identified
 
-When ready to trade with real funds:
+## Support
 
-1. Set `dryRun: false` in `src/trading-config.js`
-2. Update `.env` with real wallet credentials
-3. Start with small `minTradeSize` values
-4. Monitor closely for the first few hours
-5. Adjust parameters based on performance
+For issues or questions:
+- Check test results in `security-results/`
+- View alerts in `security-alerts.log`
+- Monitor dashboard at http://localhost:3000
+- Review console output for detailed diagnostics
 
-## Logs and Output
+## License
 
-- Trade logs: `trades.log` (JSON format, one trade per line)
-- Active pools: `active-pools-clean.json`
-- Console output: Real-time status and trades
+This software is provided as-is for security research and educational purposes. Users are responsible for compliance with all applicable laws and regulations.
+```
 
-## Disclaimer
-
-This software is for educational purposes. Users are responsible for their own trading decisions and any losses incurred.
