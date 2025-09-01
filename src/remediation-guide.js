@@ -495,6 +495,502 @@ app.use('/v1/', limiter);`,
         }
     },
 
+    // Chaincode Security Tests
+    'Access Control': {
+        description: 'Chaincode functions lack proper access control mechanisms',
+        impact: 'Unauthorized users could invoke restricted functions or access sensitive data',
+        howTestWasRun: {
+            method: 'Permission Testing',
+            details: 'Attempted to invoke admin functions without proper credentials',
+            code: `// Test unauthorized chaincode invocation
+const response = await axios.post('/v1/chaincode/invoke', {
+    chaincodeName: 'trading',
+    functionName: 'adminFunction',
+    args: ['unauthorized_test']
+}, {
+    headers: {} // No auth headers
+});`,
+            expectedBehavior: 'Should reject with 401/403 and proper error message',
+            actualBehavior: 'Function executed without authorization check'
+        },
+        remediation: {
+            immediate: [
+                'Implement certificate-based access control',
+                'Add attribute-based access control (ABAC)',
+                'Verify MSP membership before function execution'
+            ],
+            implementation: `// Hyperledger Fabric chaincode access control
+const { Context } = require('fabric-contract-api');
+
+class TradingContract extends Contract {
+    async adminFunction(ctx, ...args) {
+        // Get client identity
+        const clientIdentity = ctx.clientIdentity;
+        
+        // Check if client has admin attribute
+        if (!clientIdentity.getAttributeValue('admin')) {
+            throw new Error('Access denied: Admin privileges required');
+        }
+        
+        // Check MSP membership
+        const mspId = clientIdentity.getMSPID();
+        if (!['AdminMSP', 'TradingMSP'].includes(mspId)) {
+            throw new Error('Access denied: Invalid MSP');
+        }
+        
+        // Execute admin function
+        return await this.executeAdminOperation(args);
+    }
+}`,
+            testing: [
+                'Test with valid admin certificates',
+                'Test with invalid/expired certificates',
+                'Verify MSP membership validation',
+                'Test cross-organization access'
+            ]
+        }
+    },
+
+    'State Database Security': {
+        description: 'State database queries vulnerable to injection or unauthorized access',
+        impact: 'Could allow data extraction, state tampering, or privilege escalation',
+        howTestWasRun: {
+            method: 'Database Injection Testing',
+            details: 'Attempted CouchDB queries with malicious selectors and state manipulation',
+            code: `// Test CouchDB injection
+const maliciousQuery = {
+    selector: {"_id": {"$gt": null}},
+    execution_stats: true
+};
+const response = await axios.post('/v1/query', maliciousQuery);`,
+            expectedBehavior: 'Should sanitize queries and reject malicious patterns',
+            actualBehavior: 'Query executed and returned sensitive data'
+        },
+        remediation: {
+            immediate: [
+                'Sanitize all database queries',
+                'Implement query validation',
+                'Restrict direct state database access'
+            ],
+            implementation: `// Secure state queries in chaincode
+async querySecure(ctx, queryString) {
+    // Parse and validate query
+    let query;
+    try {
+        query = JSON.parse(queryString);
+    } catch (error) {
+        throw new Error('Invalid query format');
+    }
+    
+    // Whitelist allowed fields
+    const allowedFields = ['id', 'owner', 'amount', 'status'];
+    if (query.selector) {
+        for (const field of Object.keys(query.selector)) {
+            if (!allowedFields.includes(field)) {
+                throw new Error(\`Field '\${field}' not allowed in queries\`);
+            }
+        }
+    }
+    
+    // Execute validated query
+    const iterator = await ctx.stub.getQueryResult(JSON.stringify(query));
+    const results = await this.getAllResults(iterator);
+    
+    return results;
+}`,
+            testing: [
+                'Test query injection attempts',
+                'Verify field whitelisting works',
+                'Test access to private collections',
+                'Validate MVCC conflict handling'
+            ]
+        }
+    },
+
+    'Lifecycle Security': {
+        description: 'Chaincode lifecycle operations lack proper authorization',
+        impact: 'Malicious chaincodes could be installed or existing ones compromised',
+        howTestWasRun: {
+            method: 'Lifecycle Permission Testing',
+            details: 'Attempted unauthorized chaincode installation and policy bypass',
+            code: `// Test unauthorized chaincode operations
+const installResponse = await axios.post('/v1/chaincode/install', {
+    chaincodeName: 'malicious',
+    version: '1.0',
+    package: 'BASE64_ENCODED_MALICIOUS_CODE'
+});`,
+            expectedBehavior: 'Should require proper signatures and endorsement policies',
+            actualBehavior: 'Operations succeeded without proper authorization'
+        },
+        remediation: {
+            immediate: [
+                'Implement strict endorsement policies',
+                'Require multi-party approval for lifecycle operations',
+                'Validate chaincode packages before installation'
+            ],
+            implementation: `// Secure chaincode lifecycle policy
+{
+    "sequence": 1,
+    "version": "1.0",
+    "endorsement_plugin": "escc",
+    "validation_plugin": "vscc",
+    "validation_parameter": "AND('Org1MSP.admin', 'Org2MSP.admin')",
+    "collections_config": {
+        "name": "privateData",
+        "policy": "OR('Org1MSP.member', 'Org2MSP.member')",
+        "required_peer_count": 2,
+        "maximum_peer_count": 3
+    }
+}`,
+            testing: [
+                'Test installation with insufficient endorsements',
+                'Verify upgrade authorization',
+                'Test malicious package detection',
+                'Validate policy enforcement'
+            ]
+        }
+    },
+
+    'Cross-Chaincode Invocation': {
+        description: 'Cross-chaincode calls lack proper validation and could enable attacks',
+        impact: 'Could allow unauthorized access to other chaincodes or state corruption',
+        howTestWasRun: {
+            method: 'Cross-Contract Testing',
+            details: 'Attempted unauthorized cross-chaincode invocations and reentrancy',
+            code: `// Test cross-chaincode vulnerability
+const response = await axios.post('/v1/chaincode/cross-invoke', {
+    fromChaincode: 'trading',
+    toChaincode: 'admin',
+    function: 'emergencyWithdraw',
+    args: ['all_funds']
+});`,
+            expectedBehavior: 'Should validate permissions for cross-chaincode calls',
+            actualBehavior: 'Cross-chaincode call succeeded without validation'
+        },
+        remediation: {
+            immediate: [
+                'Implement cross-chaincode access control',
+                'Add reentrancy protection',
+                'Validate caller permissions'
+            ],
+            implementation: `// Secure cross-chaincode invocation
+async invokeChaincode(ctx, chaincodeName, functionName, args) {
+    // Check if current chaincode is authorized to invoke target
+    const currentCC = ctx.stub.getChannelId();
+    const allowedInvocations = {
+        'trading': ['liquidity', 'pricing'],
+        'governance': ['admin', 'treasury']
+    };
+    
+    if (!allowedInvocations[currentCC]?.includes(chaincodeName)) {
+        throw new Error('Cross-chaincode invocation not authorized');
+    }
+    
+    // Add reentrancy protection
+    const reentrancyKey = \`reentrancy_\${ctx.stub.getTxID()}\`;
+    const existing = await ctx.stub.getState(reentrancyKey);
+    if (existing) {
+        throw new Error('Reentrancy detected');
+    }
+    
+    await ctx.stub.putState(reentrancyKey, Buffer.from('locked'));
+    
+    try {
+        // Perform invocation
+        const result = await ctx.stub.invokeChaincode(
+            chaincodeName, 
+            [functionName, ...args], 
+            ctx.stub.getChannelId()
+        );
+        return result;
+    } finally {
+        // Clean up reentrancy lock
+        await ctx.stub.delState(reentrancyKey);
+    }
+}`,
+            testing: [
+                'Test unauthorized cross-chaincode calls',
+                'Verify reentrancy protection',
+                'Test state consistency across calls',
+                'Validate permission inheritance'
+            ]
+        }
+    },
+
+    'Deterministic Execution': {
+        description: 'Chaincode contains non-deterministic operations that could cause consensus issues',
+        impact: 'Could lead to state divergence between peers and consensus failures',
+        howTestWasRun: {
+            method: 'Determinism Testing',
+            details: 'Executed chaincode functions multiple times to check for consistent results',
+            code: `// Test for non-deterministic behavior
+const responses = [];
+for (let i = 0; i < 5; i++) {
+    const response = await axios.post('/v1/chaincode/query', {
+        function: 'getCurrentTime'
+    });
+    responses.push(response.data);
+}
+// Check if all responses are identical`,
+            expectedBehavior: 'All executions should return identical results',
+            actualBehavior: 'Results varied between executions due to time/random dependencies'
+        },
+        remediation: {
+            immediate: [
+                'Remove all random number generation',
+                'Use transaction timestamp instead of system time',
+                'Eliminate external API calls'
+            ],
+            implementation: `// Deterministic chaincode patterns
+class DeterministicContract extends Contract {
+    async transferTokens(ctx, from, to, amount) {
+        // Use transaction timestamp (deterministic)
+        const txTimestamp = ctx.stub.getTxTimestamp();
+        const timestamp = txTimestamp.seconds.toNumber();
+        
+        // Don't use Math.random() or Date.now()
+        // Use deterministic sources like transaction ID
+        const txId = ctx.stub.getTxID();
+        const deterministicSeed = this.hashTxId(txId);
+        
+        // All operations must be deterministic
+        const transfer = {
+            from,
+            to,
+            amount: parseInt(amount),
+            timestamp,
+            txId,
+            deterministicValue: deterministicSeed % 1000
+        };
+        
+        await ctx.stub.putState(
+            \`transfer_\${txId}\`, 
+            Buffer.from(JSON.stringify(transfer))
+        );
+        
+        return transfer;
+    }
+    
+    hashTxId(txId) {
+        // Simple deterministic hash
+        let hash = 0;
+        for (let i = 0; i < txId.length; i++) {
+            const char = txId.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash);
+    }
+}`,
+            testing: [
+                'Run function multiple times with same inputs',
+                'Verify consistent outputs across peers',
+                'Test with different network conditions',
+                'Validate timestamp usage patterns'
+            ]
+        }
+    },
+
+    // Time-Based Attack Tests
+    'Timestamp Manipulation': {
+        description: 'System accepts transactions with invalid or manipulated timestamps',
+        impact: 'Could allow backdated transactions, deadline bypass, or timing attacks',
+        howTestWasRun: {
+            method: 'Timestamp Validation Testing',
+            details: 'Submitted transactions with future, past, and invalid timestamps',
+            code: `// Test timestamp manipulation
+const tests = [
+    { timestamp: Date.now() + 86400000 }, // Future
+    { timestamp: Date.now() - 604800000 }, // Past week
+    { timestamp: 0 }, // Zero
+    { timestamp: -1 } // Negative
+];`,
+            expectedBehavior: 'Should reject transactions with invalid timestamps',
+            actualBehavior: 'Transactions with invalid timestamps were accepted'
+        },
+        remediation: {
+            immediate: [
+                'Implement timestamp validation',
+                'Set acceptable timestamp ranges',
+                'Use block timestamps for validation'
+            ],
+            implementation: `// Timestamp validation middleware
+const validateTimestamp = (req, res, next) => {
+    const { timestamp } = req.body;
+    const now = Date.now();
+    const TOLERANCE = 5 * 60 * 1000; // 5 minutes
+    
+    if (!timestamp) {
+        return res.status(400).json({ 
+            error: 'Timestamp required' 
+        });
+    }
+    
+    if (timestamp > now + TOLERANCE) {
+        return res.status(400).json({ 
+            error: 'Timestamp too far in future' 
+        });
+    }
+    
+    if (timestamp < now - TOLERANCE) {
+        return res.status(400).json({ 
+            error: 'Timestamp too old' 
+        });
+    }
+    
+    next();
+};`,
+            testing: [
+                'Test with various invalid timestamps',
+                'Verify tolerance ranges work correctly',
+                'Test edge cases around tolerance boundaries',
+                'Ensure block timestamp consistency'
+            ]
+        }
+    },
+
+    'Deadline Bypass': {
+        description: 'Transactions can execute after their specified deadline',
+        impact: 'Could allow execution of expired orders or time-sensitive operations',
+        howTestWasRun: {
+            method: 'Deadline Enforcement Testing',
+            details: 'Submitted transactions with expired deadlines',
+            code: `// Test deadline bypass
+const expiredDeadline = Date.now() - 3600000; // 1 hour ago
+const response = await axios.post('/v1/trade/swap', {
+    tokenIn: 'GALA',
+    tokenOut: 'GUSDC',
+    amountIn: '100',
+    deadline: expiredDeadline
+});`,
+            expectedBehavior: 'Should reject transactions past their deadline',
+            actualBehavior: 'Expired transactions were processed successfully'
+        },
+        remediation: {
+            immediate: [
+                'Implement strict deadline checking',
+                'Use consistent time source',
+                'Validate deadlines before execution'
+            ],
+            implementation: `// Deadline validation
+const validateDeadline = (deadline) => {
+    if (!deadline) {
+        throw new Error('Deadline required');
+    }
+    
+    const currentTime = Date.now();
+    
+    if (deadline <= currentTime) {
+        throw new Error('Transaction deadline exceeded');
+    }
+    
+    // Optional: Maximum deadline limit
+    const MAX_DEADLINE = 24 * 60 * 60 * 1000; // 24 hours
+    if (deadline > currentTime + MAX_DEADLINE) {
+        throw new Error('Deadline too far in future');
+    }
+    
+    return true;
+};
+
+// Usage in trade execution
+async function executeSwap(params) {
+    validateDeadline(params.deadline);
+    
+    // Execute trade logic
+    return performSwap(params);
+}`,
+            testing: [
+                'Test with various expired deadlines',
+                'Verify current time consistency',
+                'Test edge cases near deadline',
+                'Validate maximum deadline limits'
+            ]
+        }
+    },
+
+    'Time-Lock Exploits': {
+        description: 'Time-locked operations can be unlocked prematurely',
+        impact: 'Could allow early access to locked funds or bypass governance delays',
+        howTestWasRun: {
+            method: 'Time-Lock Bypass Testing',
+            details: 'Attempted to unlock funds before their release time',
+            code: `// Test premature unlock
+const response = await axios.post('/v1/timelock/withdraw', {
+    lockId: 'test_lock_1',
+    unlockTime: Date.now() + 86400000, // Should unlock tomorrow
+    forceUnlock: true
+});`,
+            expectedBehavior: 'Should enforce time-lock periods strictly',
+            actualBehavior: 'Time-locked funds were released early'
+        },
+        remediation: {
+            immediate: [
+                'Use blockchain timestamps for time-locks',
+                'Implement multi-signature requirements',
+                'Add governance override mechanisms'
+            ],
+            implementation: `// Secure time-lock implementation
+class TimeLock {
+    async createLock(ctx, beneficiary, amount, unlockTime) {
+        const currentTime = ctx.stub.getTxTimestamp().seconds.toNumber();
+        
+        if (unlockTime <= currentTime) {
+            throw new Error('Unlock time must be in future');
+        }
+        
+        const lock = {
+            beneficiary,
+            amount,
+            unlockTime,
+            created: currentTime,
+            txId: ctx.stub.getTxID(),
+            released: false
+        };
+        
+        await ctx.stub.putState(
+            \`timelock_\${ctx.stub.getTxID()}\`, 
+            Buffer.from(JSON.stringify(lock))
+        );
+        
+        return lock;
+    }
+    
+    async releaseLock(ctx, lockId) {
+        const lockData = await ctx.stub.getState(lockId);
+        if (!lockData) {
+            throw new Error('Lock not found');
+        }
+        
+        const lock = JSON.parse(lockData.toString());
+        const currentTime = ctx.stub.getTxTimestamp().seconds.toNumber();
+        
+        if (currentTime < lock.unlockTime) {
+            throw new Error(\`Lock not ready. Unlocks at \${new Date(lock.unlockTime * 1000)}\`);
+        }
+        
+        if (lock.released) {
+            throw new Error('Lock already released');
+        }
+        
+        // Mark as released
+        lock.released = true;
+        lock.releasedAt = currentTime;
+        
+        await ctx.stub.putState(lockId, Buffer.from(JSON.stringify(lock)));
+        
+        return lock;
+    }
+}`,
+            testing: [
+                'Test early unlock attempts',
+                'Verify blockchain timestamp usage',
+                'Test governance override functions',
+                'Validate multiple lock scenarios'
+            ]
+        }
+    },
+
     // Replay Attack Protection
     'Replay Attack Protection': {
         description: 'Transactions may be replayed without proper nonce management',

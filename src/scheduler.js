@@ -34,7 +34,19 @@ class SecurityScheduler {
             await this.monitor.runPhase2Tests();
         }, { scheduled: false });
 
-        // Phase 4B - every 12 hours (NEW)
+        // Phase 3 - every 8 hours (NEW)
+        const phase3Job = cron.schedule('0 */8 * * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 3 Chaincode Security tests...`);
+            await this.monitor.runPhase3Tests();
+        }, { scheduled: false });
+
+        // Phase 4A - every 4 hours (NEW)  
+        const phase4aJob = cron.schedule('0 */4 * * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 4A Time-based Attack tests...`);
+            await this.monitor.runPhase4ATests();
+        }, { scheduled: false });
+
+        // Phase 4B - every 12 hours
         const phase4bJob = cron.schedule('0 */12 * * *', async () => {
             console.log(`[${new Date().toISOString()}] Running Phase 4B tests...`);
             await this.monitor.runPhase4BTests();
@@ -47,6 +59,41 @@ class SecurityScheduler {
             await this.monitor.runPhase4CTests();
         }, { scheduled: false });
 
+        // Phase 5 - every 24 hours (daily comprehensive security)
+        const phase5Job = cron.schedule('0 1 * * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 5 Permissioned Network tests...`);
+            await this.monitor.runPhase5Tests();
+        }, { scheduled: false });
+
+        // Phase 6 - every 24 hours (staggered from Phase 5)
+        const phase6Job = cron.schedule('0 3 * * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 6 Consensus & Ordering tests...`);
+            await this.monitor.runPhase6Tests();
+        }, { scheduled: false });
+
+        // Phase 7 - every 48 hours (privacy tests)
+        const phase7Job = cron.schedule('0 5 */2 * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 7 Privacy & Confidentiality tests...`);
+            await this.monitor.runPhase7Tests();
+        }, { scheduled: false });
+
+        // Phase 8 - every 72 hours (compliance tests)
+        const phase8Job = cron.schedule('0 7 */3 * *', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 8 Compliance & Regulatory tests...`);
+            await this.monitor.runPhase8Tests();
+        }, { scheduled: false });
+
+        // Phase 9 - weekly (business logic comprehensive)
+        const phase9Job = cron.schedule('0 4 * * 0', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 9 Business Logic Exploits tests...`);
+            await this.monitor.runPhase9Tests();
+        }, { scheduled: false });
+
+        // Phase 10 - weekly (advanced threat analysis)
+        const phase10Job = cron.schedule('0 6 * * 0', async () => {
+            console.log(`[${new Date().toISOString()}] Running Phase 10 Zero-Day & APT tests...`);
+            await this.monitor.runPhase10Tests();
+        }, { scheduled: false });
 
         // Generate report - daily at 9 AM
         const reportJob = cron.schedule('0 9 * * *', async () => {
@@ -54,7 +101,7 @@ class SecurityScheduler {
             await this.reportGen.generateFromLatest();
         }, { scheduled: false });
 
-        this.runningJobs = [criticalJob, phase1Job, phase2Job, phase4bJob, phase4cJob, reportJob];
+        this.runningJobs = [criticalJob, phase1Job, phase2Job, phase3Job, phase4aJob, phase4bJob, phase4cJob, phase5Job, phase6Job, phase7Job, phase8Job, phase9Job, phase10Job, reportJob];
         
         return this.runningJobs;
     }
@@ -67,8 +114,16 @@ class SecurityScheduler {
         console.log('• Every 5 minutes:  Critical tests (rate limiting)');
         console.log('• Every hour:       Phase 1 (infrastructure)');
         console.log('• Every 6 hours:    Phase 2 (economic attacks)');
+        console.log('• Every 8 hours:    Phase 3 (chaincode security)');
+        console.log('• Every 4 hours:    Phase 4A (time-based attacks)');
         console.log('• Every 12 hours:   Phase 4B (extended surface)');
+        console.log('• Daily at 1 AM:    Phase 5 (permissioned network)');
         console.log('• Daily at 2 AM:    Phase 4C (performance)');
+        console.log('• Daily at 3 AM:    Phase 6 (consensus & ordering)');
+        console.log('• Every 2 days:     Phase 7 (privacy & confidentiality)');
+        console.log('• Every 3 days:     Phase 8 (compliance & regulatory)');
+        console.log('• Weekly Sunday:    Phase 9 (business logic exploits)');
+        console.log('• Weekly Sunday:    Phase 10 (zero-day & APT)');
         console.log('• Daily at 9 AM:    Generate reports');
         console.log('================================\n');
         
@@ -79,6 +134,8 @@ class SecurityScheduler {
         console.log('• Critical tests: ~' + new Date(now.getTime() + 5*60*1000).toLocaleTimeString());
         console.log('• Phase 1: Next hour at :00');
         console.log('• Phase 2: Next interval at 0:00, 6:00, 12:00, or 18:00');
+        console.log('• Phase 3: Next interval at 0:00, 8:00, or 16:00');
+        console.log('• Phase 4A: Next interval at 0:00, 4:00, 8:00, 12:00, 16:00, or 20:00');
         console.log('• Phase 4B: Next interval at 0:00 or 12:00');
         console.log('• Phase 4C: Tomorrow at 2:00 AM');
         console.log('• Report: Tomorrow at 9:00 AM\n');

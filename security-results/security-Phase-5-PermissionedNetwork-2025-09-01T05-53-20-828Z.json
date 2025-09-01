@@ -1,0 +1,147 @@
+{
+  "phase": "Phase 5 - Permissioned Network Attacks",
+  "timestamp": "2025-09-01T05:53:20.828Z",
+  "duration": "6488ms",
+  "totalTests": 5,
+  "passed": 5,
+  "failed": 0,
+  "passRate": "100%",
+  "criticalFindings": 0,
+  "tests": [
+    {
+      "category": "Permissioned Network",
+      "test": "MSP Identity Manipulation",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Invalid MSP Certificate",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "MSP Impersonation",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Certificate Authority Bypass",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "MSP identity validation properly enforced",
+      "timestamp": "2025-09-01T05:53:15.936Z"
+    },
+    {
+      "category": "Permissioned Network",
+      "test": "Channel Access Control",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Unauthorized Channel Join",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Channel Configuration Tampering",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Cross-Channel Data Access",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Channel Event Eavesdropping",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "Channel access controls properly enforced",
+      "timestamp": "2025-09-01T05:53:16.939Z"
+    },
+    {
+      "category": "Permissioned Network",
+      "test": "Peer Network Security",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Malicious Peer Registration",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Peer Gossip Protocol Manipulation",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Endorsement Policy Bypass",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "Peer network security properly enforced",
+      "timestamp": "2025-09-01T05:53:17.714Z"
+    },
+    {
+      "category": "Permissioned Network",
+      "test": "Organization Privilege Escalation",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Admin Role Assumption",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Policy Modification Attack",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Consensus Manipulation",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Certificate Authority Takeover",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "Organization privileges properly controlled",
+      "timestamp": "2025-09-01T05:53:19.341Z"
+    },
+    {
+      "category": "Permissioned Network",
+      "test": "Identity Revocation and CRL",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Revoked Certificate Usage",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "CRL Bypass Attempt",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Expired Certificate Usage",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "Certificate revocation properly enforced",
+      "timestamp": "2025-09-01T05:53:20.828Z"
+    }
+  ]
+}

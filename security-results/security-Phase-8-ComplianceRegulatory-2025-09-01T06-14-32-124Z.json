@@ -1,0 +1,204 @@
+{
+  "phase": "Phase 8 - Compliance & Regulatory",
+  "timestamp": "2025-09-01T06:14:32.124Z",
+  "duration": "14214ms",
+  "totalTests": 6,
+  "passed": 6,
+  "failed": 0,
+  "passRate": "100%",
+  "criticalFindings": 0,
+  "tests": [
+    {
+      "category": "Compliance & Regulatory",
+      "test": "AML/KYC Bypass Attempts",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Unverified User Trading",
+          "vulnerable": false,
+          "status": 404,
+          "tradeValue": "50000"
+        },
+        {
+          "test": "Transaction Limit Bypass",
+          "vulnerable": false,
+          "status": "limit_test",
+          "details": {
+            "successfulTrades": 0,
+            "totalValue": 0,
+            "dailyLimit": 10000
+          }
+        },
+        {
+          "test": "Sanctioned Address Bypass",
+          "vulnerable": false,
+          "status": "sanction_test",
+          "details": {
+            "sanctionedAddressesTested": 2,
+            "bypassCount": 0,
+            "results": [
+              {
+                "address": "0x1234567890123456789012345678901234567890",
+                "allowed": false,
+                "status": 404
+              },
+              {
+                "address": "0xDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF",
+                "allowed": false,
+                "status": 404
+              }
+            ]
+          }
+        }
+      ],
+      "recommendation": "AML/KYC controls properly enforced",
+      "timestamp": "2025-09-01T06:14:21.838Z"
+    },
+    {
+      "category": "Compliance & Regulatory",
+      "test": "Jurisdiction Control Bypass",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Geolocation Bypass",
+          "vulnerable": false,
+          "status": 404,
+          "jurisdictionEnforced": true
+        },
+        {
+          "test": "IP Spoofing Detection",
+          "vulnerable": false,
+          "status": 404,
+          "jurisdictionEnforced": true
+        },
+        {
+          "test": "Cross-Border Transaction Restrictions",
+          "vulnerable": false,
+          "status": 404,
+          "jurisdictionEnforced": true
+        },
+        {
+          "test": "Regulatory Reporting Bypass",
+          "vulnerable": false,
+          "status": 404,
+          "jurisdictionEnforced": true
+        }
+      ],
+      "recommendation": "Jurisdiction controls properly enforced",
+      "timestamp": "2025-09-01T06:14:22.829Z"
+    },
+    {
+      "category": "Compliance & Regulatory",
+      "test": "Regulatory Reporting Failures",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Suspicious Activity Reporting",
+          "vulnerable": false,
+          "status": 404,
+          "reportFiled": false
+        },
+        {
+          "test": "Large Transaction Reporting",
+          "vulnerable": false,
+          "status": 404,
+          "reportFiled": false
+        },
+        {
+          "test": "Cross-Border Reporting",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "Regulatory reporting working correctly",
+      "timestamp": "2025-09-01T06:14:23.602Z"
+    },
+    {
+      "category": "Compliance & Regulatory",
+      "test": "Data Retention Compliance",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "GDPR Data Deletion",
+          "vulnerable": false,
+          "status": 404,
+          "complianceViolation": false
+        },
+        {
+          "test": "Legal Hold Override",
+          "vulnerable": false,
+          "status": 404,
+          "complianceViolation": false
+        },
+        {
+          "test": "Audit Trail Preservation",
+          "vulnerable": false,
+          "status": 404,
+          "complianceViolation": false
+        },
+        {
+          "test": "Cross-Jurisdiction Data Transfer",
+          "vulnerable": false,
+          "status": 404,
+          "complianceViolation": false
+        }
+      ],
+      "recommendation": "Data retention policies properly enforced",
+      "timestamp": "2025-09-01T06:14:24.561Z"
+    },
+    {
+      "category": "Compliance & Regulatory",
+      "test": "License and Registration Validation",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Unlicensed Operation Test",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Registration Requirements",
+          "vulnerable": false,
+          "status": 404
+        },
+        {
+          "test": "Regulatory Capital Requirements",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "License and registration validation working correctly",
+      "timestamp": "2025-09-01T06:14:25.278Z"
+    },
+    {
+      "category": "Compliance & Regulatory",
+      "test": "Market Manipulation Detection",
+      "passed": true,
+      "severity": "PASS",
+      "details": [
+        {
+          "test": "Wash Trading Detection",
+          "vulnerable": false,
+          "status": "wash_trading_test",
+          "details": {
+            "attemptedWashTrades": 10,
+            "successfulWashTrades": 0,
+            "detectionTriggered": true
+          }
+        },
+        {
+          "test": "Pump and Dump Scheme",
+          "vulnerable": false,
+          "status": 404
+        }
+      ],
+      "recommendation": "Market manipulation detection working correctly",
+      "timestamp": "2025-09-01T06:14:32.124Z"
+    }
+  ]
+}

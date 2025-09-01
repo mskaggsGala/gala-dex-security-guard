@@ -4,6 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const Phase4BMonitor = require('./phase4b-integration');
 const Phase4CMonitor = require('./phase4c-integration');
+const ChaincodeTester = require('./phase3-chaincode-security');
+const TimeBasedTester = require('./phase4-time-based-attacks');
+const PermissionedNetworkTester = require('./phase5-permissioned-network');
+const ConsensusOrderingTester = require('./phase6-consensus-ordering');
+const PrivacyConfidentialityTester = require('./phase7-privacy-confidentiality');
+const ComplianceRegulatoryTester = require('./phase8-compliance-regulatory');
+const BusinessLogicExploitsTester = require('./phase9-business-logic-exploits');
+const ZeroDayAPTTester = require('./phase10-zero-day-apt');
 
 
 
@@ -191,6 +199,21 @@ class SecurityMonitor {
     }
 
 
+    // Phase 3: Chaincode Security Tests
+    async runPhase3Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 3 CHAINCODE SECURITY');
+        console.log('========================================');
+
+        const chaincodeTester = new ChaincodeTester();
+        const results = await chaincodeTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
     // Add method to SecurityMonitor class
     async runPhase4CTests() {
         const phase4c = new Phase4CMonitor();
@@ -207,6 +230,111 @@ class SecurityMonitor {
         this.printSummary(standardResults);
         
         return standardResults;
+    }
+
+    // Phase 4A: Time-Based Attack Tests  
+    async runPhase4ATests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 4A TIME-BASED ATTACKS');
+        console.log('========================================');
+
+        const timeBasedTester = new TimeBasedTester();
+        const results = await timeBasedTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+    // Phase 5: Permissioned Network Attack Tests
+    async runPhase5Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 5 PERMISSIONED NETWORK ATTACKS');
+        console.log('========================================');
+
+        const permissionedNetworkTester = new PermissionedNetworkTester();
+        const results = await permissionedNetworkTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+    // Phase 6: Consensus & Ordering Service Tests
+    async runPhase6Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 6 CONSENSUS & ORDERING');
+        console.log('========================================');
+
+        const consensusOrderingTester = new ConsensusOrderingTester();
+        const results = await consensusOrderingTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+    // Phase 7: Privacy & Confidentiality Tests
+    async runPhase7Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 7 PRIVACY & CONFIDENTIALITY');
+        console.log('========================================');
+
+        const privacyConfidentialityTester = new PrivacyConfidentialityTester();
+        const results = await privacyConfidentialityTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+    // Phase 8: Compliance & Regulatory Tests
+    async runPhase8Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 8 COMPLIANCE & REGULATORY');
+        console.log('========================================');
+
+        const complianceRegulatoryTester = new ComplianceRegulatoryTester();
+        const results = await complianceRegulatoryTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+    // Phase 9: Business Logic Exploits Tests
+    async runPhase9Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 9 BUSINESS LOGIC EXPLOITS');
+        console.log('========================================');
+
+        const businessLogicExploitsTester = new BusinessLogicExploitsTester();
+        const results = await businessLogicExploitsTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
+    }
+
+    // Phase 10: Zero-Day & Advanced Persistent Threats Tests
+    async runPhase10Tests() {
+        console.log('\n========================================');
+        console.log('SECURITY MONITOR - PHASE 10 ZERO-DAY & APT');
+        console.log('========================================');
+
+        const zeroDayAPTTester = new ZeroDayAPTTester();
+        const results = await zeroDayAPTTester.runTests();
+        
+        this.saveResults(results);
+        this.printSummary(results);
+        
+        return results;
     }
 
 

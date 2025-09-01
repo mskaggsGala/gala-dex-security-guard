@@ -43,7 +43,16 @@ class EnhancedSecurityDashboard {
                 
                 if (content.phase && content.tests) {
                     const phaseMatch = content.phase.match(/Phase \d+[A-Z]?/);
-                    const phaseKey = phaseMatch ? phaseMatch[0] : content.phase;
+                    let phaseKey;
+                    if (phaseMatch) {
+                        phaseKey = phaseMatch[0];
+                    } else if (content.phase.includes('Phase')) {
+                        // Handle "Phase 5 - Description" format
+                        const parts = content.phase.split(' - ');
+                        phaseKey = parts[0];
+                    } else {
+                        phaseKey = content.phase;
+                    }
                     
                     if (!foundPhases.has(phaseKey)) {
                         foundPhases.add(phaseKey);

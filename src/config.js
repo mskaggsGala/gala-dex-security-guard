@@ -34,6 +34,7 @@ module.exports = {
         checkInterval: parseInt(process.env.CHECK_INTERVAL_MS || '5000'),
         minProfitThreshold: parseFloat(process.env.MIN_PROFIT_THRESHOLD || '0.01')
     },
+    apiUrl: process.env.GALASWAP_API_URL || 'https://dex-backend-prod1.defi.gala.com',
     paths: {
             resultsDir: './security-results',
             reportsDir: './security-reports',
@@ -41,6 +42,9 @@ module.exports = {
             monitoringDir: './monitoring',
             dashboardDir: './dashboard'
         },
+    directories: {
+        results: './security-results'
+    },
         testing: {
             rateLimit: {
                 requestCount: 100,
