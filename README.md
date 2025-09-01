@@ -13,11 +13,16 @@ A comprehensive security monitoring system and automated trading bot for the Gal
 - **Phase 4B: Extended Attack Surface** - Bridge security, pool creation validation, advanced endpoint testing
 - **Phase 4C: Performance & Load** - Rate limit detection, concurrent load handling, performance degradation analysis
 
-### Real-Time Dashboard
-- Live security score and test results at http://localhost:3000
-- Critical issue alerts and recommendations
-- Auto-refreshing status display
-- Historical test result tracking
+### Enhanced Security Dashboard (NEW!)
+- **Interactive Dashboard** at http://localhost:3001 with clickable issue cards
+- **Detailed Remediation Guidance** - Click any issue to see:
+  - How the test was run (methodology and code)
+  - Expected vs actual behavior
+  - Step-by-step fix instructions with code examples
+  - Testing checklists for verification
+- **Smart Issue Display** - Automatically formats complex test results
+- **Test Phase Status** - Visual overview of security state per phase
+- **Developer-Friendly** - Everything needed to understand and fix issues
 
 ### Automated Scheduling
 - Critical tests every 5 minutes
@@ -74,7 +79,13 @@ node src/test-all-phases.js
 node src/scheduler.js
 ```
 
-#### View Live Dashboard
+#### View Enhanced Dashboard (Recommended)
+```bash
+node src/enhanced-dashboard.js
+# Open http://localhost:3001 in your browser
+```
+
+#### View Original Dashboard
 ```bash
 node src/dashboard.js
 # Open http://localhost:3000 in your browser
@@ -119,7 +130,9 @@ npm run trade  # Start trading bot (simulation mode by default)
 galaswap-security-monitor/
 ├── src/
 │   ├── config.js                    # Central configuration
-│   ├── dashboard.js                 # Live monitoring dashboard
+│   ├── dashboard.js                 # Original monitoring dashboard
+│   ├── enhanced-dashboard.js        # NEW: Interactive dashboard with remediation
+│   ├── remediation-guide.js         # NEW: Comprehensive fix guidance
 │   ├── scheduler.js                 # Automated test scheduler
 │   ├── security-monitor.js          # Core security test orchestrator
 │   ├── test-all-phases.js          # Manual test runner
@@ -182,11 +195,29 @@ Test results are saved in `security-results/` with naming convention:
 4. Test with `test-all-phases.js`
 
 ### Dashboard Customization
-Edit `src/dashboard.js` to modify:
-- Display format
+
+#### Enhanced Dashboard (src/enhanced-dashboard.js)
+- Interactive issue cards with click-to-expand details
+- Remediation guidance in `src/remediation-guide.js`
+- Smart formatting for complex test results
+- Fallback content for tests without specific guidance
+
+#### Original Dashboard (src/dashboard.js)
+- Simple status display
 - Alert thresholds
 - Refresh intervals
 - Test categorization
+
+### Adding Remediation Guidance
+1. Edit `src/remediation-guide.js`
+2. Add entry with test name as key
+3. Include:
+   - Description and impact
+   - How test was run (method, code)
+   - Expected vs actual behavior
+   - Immediate remediation steps
+   - Implementation examples
+   - Testing checklist
 
 ## Risk Warning
 
