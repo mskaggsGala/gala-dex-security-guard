@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-09-01T20:23:37.580Z",
+  "before": {
+    "rawCount": 269,
+    "rawSizeMB": 0,
+    "compressedCount": 0,
+    "compressedSizeMB": 0,
+    "totalSizeMB": 0,
+    "totalSizeGB": "0.00"
+  },
+  "after": {
+    "rawCount": 269,
+    "rawSizeMB": 0,
+    "compressedCount": 0,
+    "compressedSizeMB": 0,
+    "totalSizeMB": 0,
+    "totalSizeGB": "0.00"
+  },
+  "actions": {
+    "filesProcessed": 269,
+    "filesCompressed": 0,
+    "filesDeleted": 0,
+    "spaceFreedMB": 0,
+    "criticalFindingsSaved": 225
+  },
+  "spaceSaved": {
+    "MB": 0,
+    "GB": "0.00"
+  },
+  "policies": {
+    "resultsDir": "./security-results",
+    "archiveDir": "./security-archives",
+    "keepRawDays": 7,
+    "keepCompressedDays": 30,
+    "keepSummaryDays": 90,
+    "compressAfterDays": 3,
+    "maxDiskUsageGB": 5,
+    "warningThresholdGB": 3,
+    "keepCriticalAlways": true,
+    "keepFailedTests": true
+  }
+}
