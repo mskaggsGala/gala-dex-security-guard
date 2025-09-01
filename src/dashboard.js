@@ -82,6 +82,71 @@ class SecurityDashboard {
     }
 
 
+    // Aggregate results from all test files
+
+    aggregateResults() {
+        const results = {};
+        
+        try {
+            // Get latest file for each phase
+            const files = fs.readdirSync(this.resultsDir)
+                .filter(f => f.endsWith('.json'))
+                .sort((a, b) => b.localeCompare(a)); // Sort newest first
+            
+            // Track which phases we've already found
+            const foundPhases = new Set();
+            
+            for (const file of files) {
+                const content = JSON.parse(
+                    fs.readFileSync(path.join(this.resultsDir, file), 'utf-8')
+                );
+                
+                if (content.phase && content.tests) {
+                    // Extract phase number (Phase 1, Phase 2, etc.)
+                    const phaseMatch = content.phase.match(/Phase \d+[A-Z]?/);
+                    const phaseKey = phaseMatch ? phaseMatch[0] : content.phase;
+                    
+                    // Only use the first (newest) result for each phase
+                    if (!foundPhases.has(phaseKey)) {
+                        console.log(`Loading ${phaseKey} from ${file}`);
+                        foundPhases.add(phaseKey);
+                        results[phaseKey] = {
+                            name: content.phase,
+                            tests: content.tests.map(test => {
+                                // Fix object serialization issues
+                                
+                                if (test.details && typeof test.details === 'object') {
+                                    // Extract meaningful message from details
+                                    if (test.details.message) {
+                                        test.details = test.details.message;
+                                    } else if (test.details.error) {
+                                        test.details = test.details.error;
+                                    } else if (test.details.requestsSent) {
+                                        test.details = `${test.details.requestsSent} requests in ${test.details.duration}`;
+                                    } else {
+                                        test.details = 'Issue detected';
+                                    }
+                                }
+
+
+
+                                return test;
+                            })
+                        };
+                    }
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error aggregating results:', error);
+        }
+        
+        return results;
+    }
+
+  
+
+
   // Replace the existing generateHTML method with this one
     generateHTML() {
         // Check if we should use improved version
@@ -98,473 +163,195 @@ class SecurityDashboard {
 
     // Replace the generateImprovedHTML method in your dashboard.js with this complete version
 
-    generateImprovedHTML() {
-        // Get all recent test results to build current state
-        const allResults = this.getLatestResults(50); // Get more results for better coverage
-        const alertStats = this.getAlertStats();
-        
-        // Build comprehensive test state from all results
-        const testMap = new Map();
-        const phaseStatus = {
-            'Phase 1: Infrastructure': { passed: 0, total: 0, issues: [] },
-            'Phase 2: Economic Security': { passed: 0, total: 0, issues: [] },
-            'Phase 4B: Extended Surface': { passed: 0, total: 0, issues: [] },
-            'Phase 4C: Performance': { passed: 0, total: 0, issues: [] }
-        };
-        
-        // Process all results to get the most recent state of each test
-        allResults.forEach(result => {
-            if (result.tests) {
-                result.tests.forEach(test => {
-                    // Create unique key for each test
-                    const testKey = test.test || test.name || 'Unknown Test';
-                    
-                    // Store the most recent result for each test
-                    if (!testMap.has(testKey) || new Date(test.timestamp) > new Date(testMap.get(testKey).timestamp)) {
-                        testMap.set(testKey, {
-                            ...test,
-                            phase: result.phase || this.determinePhase(testKey)
-                        });
-                    }
+   generateImprovedHTML() {
+    const results = this.aggregateResults();
+    
+    // Calculate statistics
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = [];
+    let criticalCount = 0;
+    let highCount = 0;
+    let mediumCount = 0;
+    let lowCount = 0;
+
+    Object.values(results).forEach(phase => {
+        phase.tests.forEach(test => {
+            totalTests++;
+        // Check both formats: test.passed and test.status
+            if (test.passed || test.status === 'PASS' || test.status === 'PROTECTED') {
+                passedTests++;
+            } else {
+                failedTests.push({
+                    phase: phase.name,
+                    ...test
                 });
+                
+                if (test.severity === 'CRITICAL') criticalCount++;
+                else if (test.severity === 'HIGH') highCount++;
+                else if (test.severity === 'MEDIUM') mediumCount++;
+                else if (test.severity === 'LOW') lowCount++;
             }
         });
-        
-        // Helper function to determine phase from test name
-        const determinePhase = (testName) => {
-            if (testName.includes('Rate Limit')) return 'Phase 1: Infrastructure';
-            if (testName.includes('Liquidity') || testName.includes('Precision')) return 'Phase 1: Infrastructure';
-            if (testName.includes('MEV') || testName.includes('Arbitrage') || testName.includes('Flash Loan')) return 'Phase 2: Economic Security';
-            if (testName.includes('WebSocket') || testName.includes('Pool Creation') || testName.includes('Bridge') || testName.includes('Extended')) return 'Phase 4B: Extended Surface';
-            if (testName.includes('Performance') || testName.includes('Load') || testName.includes('Payload') || testName.includes('Response Time') || testName.includes('Degradation')) return 'Phase 4C: Performance';
-            return 'Phase 1: Infrastructure';
-        };
-        
-        // Build phase statistics from test map
-        testMap.forEach((test, testName) => {
-            const phase = test.phase || determinePhase(testName);
-            
-            if (phaseStatus[phase]) {
-                phaseStatus[phase].total++;
-                
-                if (test.passed) {
-                    phaseStatus[phase].passed++;
-                } else {
-                    // Map severity values to consistent format
-                    let severity = test.severity || 'LOW';
-                    if (severity === 'PASS') severity = 'LOW';
-                    
-                    phaseStatus[phase].issues.push({
-                        name: testName,
-                        severity: severity,
-                        details: test.details || test.error || 'Test failed',
-                        recommendation: test.recommendation || 'Review and address issue'
-                    });
-                }
-            }
-        });
-        
-        // Ensure known issues are included
-        // Rate Limiting (Critical)
-        if (!testMap.has('Rate Limiting') && !testMap.has('No Rate Limiting')) {
-            phaseStatus['Phase 1: Infrastructure'].total++;
-            phaseStatus['Phase 1: Infrastructure'].issues.push({
-                name: 'No Rate Limiting',
-                severity: 'CRITICAL',
-                details: 'API accepts unlimited requests. 100 requests processed in 345ms.',
-                recommendation: 'Implement rate limiting immediately (100 req/min per IP)'
-            });
+    });
+
+    const passRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+    const securityScore = criticalCount > 0 ? 0 : (10 - highCount * 2 - mediumCount * 1);
+
+    // Sort and deduplicate failed tests
+    const severityOrder = { 'CRITICAL': 1, 'HIGH': 2, 'MEDIUM': 3, 'LOW': 4 };
+    const uniqueTests = new Map();
+    
+    failedTests.forEach(test => {
+        const testName = test.test || test.testName || test.name || 'Unknown Test';
+        if (testName === 'Unknown Test') {
+            console.log('Found Unknown Test:', test);
         }
-        
-        // Large Payload Limit (Medium) - Phase 4C
-        const hasPayloadTest = Array.from(testMap.keys()).some(key => 
-            key.includes('Payload') || key.includes('Large Payload')
-        );
-        
-        if (!hasPayloadTest || testMap.get('Large Payload Performance')?.passed === false) {
-            // Make sure Phase 4C has correct counts
-            if (phaseStatus['Phase 4C: Performance'].total < 5) {
-                phaseStatus['Phase 4C: Performance'].total = 5;
-                phaseStatus['Phase 4C: Performance'].passed = 4;
-            }
-            
-            // Add the issue if not already present
-            const hasPayloadIssue = phaseStatus['Phase 4C: Performance'].issues.some(i => 
-                i.name.includes('Payload')
-            );
-            
-            if (!hasPayloadIssue) {
-                phaseStatus['Phase 4C: Performance'].issues.push({
-                    name: 'Large Payload Limit',
-                    severity: 'MEDIUM',
-                    details: '10,000 item batches rejected (HTTP 413)',
-                    recommendation: 'Document or increase limits'
-                });
-            }
+        if (!uniqueTests.has(testName) || 
+            severityOrder[test.severity] < severityOrder[uniqueTests.get(testName).severity]) {
+            uniqueTests.set(testName, test);
         }
-        
-        // Collect all issues by severity
-        const criticalIssues = [];
-        const highIssues = [];
-        const mediumIssues = [];
-        const lowIssues = [];
-        
-        Object.values(phaseStatus).forEach(phase => {
-            phase.issues.forEach(issue => {
-                if (issue.severity === 'CRITICAL') criticalIssues.push(issue);
-                else if (issue.severity === 'HIGH') highIssues.push(issue);
-                else if (issue.severity === 'MEDIUM') mediumIssues.push(issue);
-                else lowIssues.push(issue);
-            });
-        });
-        
-        // Calculate overall metrics
-        const totalTests = Object.values(phaseStatus).reduce((sum, p) => sum + p.total, 0);
-        const totalPassed = Object.values(phaseStatus).reduce((sum, p) => sum + p.passed, 0);
-        const passRate = totalTests > 0 ? Math.round((totalPassed / totalTests) * 100) : 0;
-        const securityScore = Math.max(0, 10 - criticalIssues.length * 3 - highIssues.length * 2 - mediumIssues.length);
-        
-        // Generate the HTML
-        const html = `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>GalaSwap Security Dashboard</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .critical-banner {
-            background: #ff0000;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            animation: blink 2s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(255,0,0,0.5); }
-            50% { opacity: 0.8; box-shadow: 0 0 40px rgba(255,0,0,0.8); }
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        h1 {
-            color: white;
-            text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            font-size: 2.5em;
-        }
-        
-        .priority-section {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .priority-section h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .issue-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 5px solid;
-        }
-        
-        .issue-item.critical {
-            background: #ffebee;
-            border-left-color: #ff0000;
-        }
-        
-        .issue-item.high {
-            background: #fff3e0;
-            border-left-color: #ff9800;
-        }
-        
-        .issue-item.medium {
-            background: #fff9c4;
-            border-left-color: #ffc107;
-        }
-        
-        .issue-item.low {
-            background: #f1f8e9;
-            border-left-color: #8bc34a;
-        }
-        
-        .issue-icon {
-            font-size: 2em;
-            margin-right: 15px;
-        }
-        
-        .issue-details h3 {
-            margin: 0 0 5px 0;
-            color: #333;
-        }
-        
-        .issue-details p {
-            margin: 5px 0;
-            color: #666;
-        }
-        
-        .issue-details strong {
-            color: #333;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .stat-label {
-            color: #666;
-            font-size: 0.9em;
-        }
-        
-        .test-status {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .test-status h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .test-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .test-row:last-child {
-            border-bottom: none;
-        }
-        
-        .test-name {
-            font-weight: 500;
-            color: #333;
-            flex: 1;
-        }
-        
-        .test-result {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 2;
-            justify-content: flex-end;
-        }
-        
-        .issue-indicators {
-            display: flex;
-            gap: 10px;
-            margin-right: 20px;
-        }
-        
-        .issue-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 500;
-        }
-        
-        .issue-badge.critical {
-            background: #ffebee;
-            color: #c62828;
-        }
-        
-        .issue-badge.high {
-            background: #fff3e0;
-            color: #e65100;
-        }
-        
-        .issue-badge.medium {
-            background: #fff9c4;
-            color: #f57c00;
-        }
-        
-        .issue-badge.low {
-            background: #f1f8e9;
-            color: #558b2f;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-left: 5px;
-        }
-        
-        .status-dot.pass { background: #4caf50; }
-        .status-dot.partial { background: #ff9800; }
-        .status-dot.fail { background: #ff0000; }
-        
-        .refresh-info {
-            text-align: center;
-            color: white;
-            margin-top: 20px;
-            font-size: 0.9em;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🔒 GalaSwap Security Dashboard</h1>
-        
-        ${criticalIssues.length > 0 ? `
-        <div class="critical-banner">
-            ⚠️ CRITICAL: ${criticalIssues.map(i => i.name).join(' | ')} ⚠️
-        </div>
-        ` : ''}
-        
-        <div class="priority-section">
-            <h2>Priority Issues Requiring Action</h2>
-            
-            ${criticalIssues.map(issue => `
-            <div class="issue-item critical">
-                <div class="issue-icon">🔴</div>
-                <div class="issue-details">
-                    <h3>${issue.name}</h3>
-                    <p>${typeof issue.details === 'object' ? JSON.stringify(issue.details) : issue.details}</p>
-                    <p><strong>Action:</strong> ${issue.recommendation}</p>
-                </div>
-            </div>
-            `).join('')}
-            
-            ${highIssues.map(issue => `
-            <div class="issue-item high">
-                <div class="issue-icon">🟠</div>
-                <div class="issue-details">
-                    <h3>${issue.name}</h3>
-                    <p>${typeof issue.details === 'object' ? JSON.stringify(issue.details) : issue.details}</p>
-                    <p><strong>Action:</strong> ${issue.recommendation}</p>
-                </div>
-            </div>
-            `).join('')}
-            
-            ${mediumIssues.map(issue => `
-            <div class="issue-item medium">
-                <div class="issue-icon">🟡</div>
-                <div class="issue-details">
-                    <h3>${issue.name}</h3>
-                    <p>${typeof issue.details === 'object' ? JSON.stringify(issue.details) : issue.details}</p>
-                    <p><strong>Action:</strong> ${issue.recommendation}</p>
-                </div>
-            </div>
-            `).join('')}
-            
-            ${(criticalIssues.length + highIssues.length + mediumIssues.length) === 0 ? 
-                '<p style="color: #4caf50; text-align: center;">✓ No critical issues detected</p>' : ''}
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Security Score</div>
-                <div class="stat-value" style="color: ${securityScore >= 8 ? '#4caf50' : securityScore >= 5 ? '#ff9800' : '#ff0000'};">${securityScore}/10</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Critical Issues</div>
-                <div class="stat-value" style="color: ${criticalIssues.length === 0 ? '#4caf50' : '#ff0000'};">${criticalIssues.length}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">High Severity</div>
-                <div class="stat-value" style="color: ${highIssues.length === 0 ? '#4caf50' : '#ff9800'};">${highIssues.length}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Tests Passed</div>
-                <div class="stat-value" style="color: ${passRate >= 80 ? '#4caf50' : passRate >= 60 ? '#ff9800' : '#ff0000'};">${passRate}%</div>
-            </div>
-        </div>
-        
-        <div class="test-status">
-            <h2>Test Phase Status</h2>
-            ${Object.entries(phaseStatus).map(([phaseName, phase]) => {
-                const phasePassRate = phase.total > 0 ? phase.passed / phase.total : 0;
-                const statusClass = phasePassRate === 1 ? 'pass' : phasePassRate >= 0.8 ? 'partial' : 'fail';
-                
-                // Count issues by severity for this phase
-                const phaseCritical = phase.issues.filter(i => i.severity === 'CRITICAL').length;
-                const phaseHigh = phase.issues.filter(i => i.severity === 'HIGH').length;
-                const phaseMedium = phase.issues.filter(i => i.severity === 'MEDIUM').length;
-                const phaseLow = phase.issues.filter(i => i.severity === 'LOW').length;
-                
-                return `
-                <div class="test-row">
-                    <span class="test-name">${phaseName}</span>
-                    <div class="test-result">
-                        <div class="issue-indicators">
-                            ${phaseCritical > 0 ? `<span class="issue-badge critical">Critical: ${phaseCritical}</span>` : ''}
-                            ${phaseHigh > 0 ? `<span class="issue-badge high">High: ${phaseHigh}</span>` : ''}
-                            ${phaseMedium > 0 ? `<span class="issue-badge medium">Medium: ${phaseMedium}</span>` : ''}
-                            ${phaseLow > 0 ? `<span class="issue-badge low">Low: ${phaseLow}</span>` : ''}
-                            ${phase.issues.length === 0 ? '<span style="color: #4caf50;">All Tests ✓</span>' : ''}
-                        </div>
-                        <span>${phase.passed}/${phase.total} Tests</span>
-                        <div class="status-dot ${statusClass}"></div>
+    });
+
+    const sortedTests = Array.from(uniqueTests.values()).sort((a, b) => 
+        severityOrder[a.severity] - severityOrder[b.severity]
+    );
+
+    // Build priority issues HTML
+    let issuesHTML = '';
+    sortedTests.forEach(test => {
+        const testName = test.test || test.testName || test.name || 'Unknown Test';
+        const severityClass = test.severity.toLowerCase();
+        const bgColor = {
+            'critical': '#ffebee',
+            'high': '#fff3e0',
+            'medium': '#fffde7',
+            'low': '#f3e5f5'
+        }[severityClass] || '#f5f5f5';
+
+        issuesHTML += `
+            <div style="background: ${bgColor}; padding: 15px; margin: 10px 0; border-left: 4px solid ${
+                test.severity === 'CRITICAL' ? '#f44336' : 
+                test.severity === 'HIGH' ? '#ff9800' : 
+                test.severity === 'MEDIUM' ? '#ffc107' : '#9c27b0'
+            };">
+                <div style="display: flex; align-items: center;">
+                    <span style="font-size: 24px; margin-right: 15px;">${
+                        test.severity === 'CRITICAL' ? '🔴' : 
+                        test.severity === 'HIGH' ? '🟠' : 
+                        test.severity === 'MEDIUM' ? '🟡' : '🟣'
+                    }</span>
+                    <div style="flex: 1;">
+                        <strong style="font-size: 16px;">${testName}</strong>
+                        <div style="color: #666; margin-top: 5px;">${test.details || 'Issue detected'}</div>
+                        <div style="margin-top: 5px;"><strong>Action:</strong> ${test.recommendation || 'Review and fix'}</div>
                     </div>
                 </div>
-                `;
-            }).join('')}
-        </div>
-        
-        <div class="refresh-info">
-            Auto-refreshes every 30 seconds | Last updated: ${new Date().toLocaleString()}
-        </div>
-    </div>
-    
-    <script>
-        setTimeout(() => location.reload(), 30000);
-    </script>
-</body>
-</html>
-    `;
-    
-        return html;
-    }
+            </div>`;
+    });
 
+    // Build phase status HTML
+    let phaseStatusHTML = '';
+    Object.keys(results).forEach(phaseKey => {
+        const phase = results[phaseKey];
+        const phasePassed = phase.tests.filter(t => t.passed || t.status === 'PASS' || t.status === 'PROTECTED').length;
+        const phaseTotal = phase.tests.length;
+        const phaseIssues = phase.tests.filter(t => !t.passed);
+        
+        const phaseCritical = phaseIssues.filter(t => t.severity === 'CRITICAL').length;
+        const phaseHigh = phaseIssues.filter(t => t.severity === 'HIGH').length;
+        const phaseMedium = phaseIssues.filter(t => t.severity === 'MEDIUM').length;
+        const phaseLow = phaseIssues.filter(t => t.severity === 'LOW').length;
+
+        let issuesBadges = '';
+        if (phaseCritical > 0) issuesBadges += `<span style="background: #f44336; color: white; padding: 2px 8px; border-radius: 3px; margin-right: 5px;">Critical: ${phaseCritical}</span>`;
+        if (phaseHigh > 0) issuesBadges += `<span style="background: #ff9800; color: white; padding: 2px 8px; border-radius: 3px; margin-right: 5px;">High: ${phaseHigh}</span>`;
+        if (phaseMedium > 0) issuesBadges += `<span style="background: #ffc107; color: #333; padding: 2px 8px; border-radius: 3px; margin-right: 5px;">Medium: ${phaseMedium}</span>`;
+        if (phaseLow > 0) issuesBadges += `<span style="background: #9c27b0; color: white; padding: 2px 8px; border-radius: 3px; margin-right: 5px;">Low: ${phaseLow}</span>`;
+        
+        if (!issuesBadges) {
+            issuesBadges = '<span style="color: #4caf50;">All Tests ✓</span>';
+        }
+
+        phaseStatusHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #ddd;">
+                <div style="font-weight: bold;">${phase.name}</div>
+                <div style="display: flex; align-items: center;">
+                    ${issuesBadges}
+                    <span style="margin-left: 20px; font-weight: bold;">${phasePassed}/${phaseTotal} Tests</span>
+                    <span style="margin-left: 10px; font-size: 20px;">${phaseIssues.length === 0 ? '🟢' : '🔴'}</span>
+                </div>
+            </div>`;
+    });
+
+    return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>GalaSwap Security Dashboard</title>
+            <meta http-equiv="refresh" content="30">
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+                .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+                .header { background: rgba(255,255,255,0.95); padding: 25px; border-radius: 10px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                .alert-bar { background: #f44336; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; }
+                .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+                .metric-card { background: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                .priority-issues { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                .phase-status { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                .footer { text-align: center; color: white; padding: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1 style="margin: 0; color: #333;">🔒 GalaSwap Security Dashboard</h1>
+                </div>
+                
+                ${criticalCount > 0 ? `
+                <div class="alert-bar">
+                    <span style="font-size: 24px; margin-right: 10px;">⚠️</span>
+                    <strong>CRITICAL: ${sortedTests.find(t => t.severity === 'CRITICAL')?.test || 'Security Issue'} | ${sortedTests.find(t => t.severity === 'CRITICAL')?.details || 'Immediate action required'}</strong>
+                    <span style="margin-left: 10px;">⚠️</span>
+                </div>` : ''}
+                
+                <div class="priority-issues">
+                    <h2 style="margin-top: 0;">Priority Issues Requiring Action</h2>
+                    ${issuesHTML || '<p style="color: #4caf50;">✓ All tests passing - no issues detected</p>'}
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric-card">
+                        <div style="font-size: 14px; color: #666;">Security Score</div>
+                        <div style="font-size: 36px; font-weight: bold; color: ${securityScore < 5 ? '#f44336' : '#4caf50'};">${Math.max(0, securityScore)}/10</div>
+                    </div>
+                    <div class="metric-card">
+                        <div style="font-size: 14px; color: #666;">Critical Issues</div>
+                        <div style="font-size: 36px; font-weight: bold; color: #f44336;">${criticalCount}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div style="font-size: 14px; color: #666;">High Severity</div>
+                        <div style="font-size: 36px; font-weight: bold; color: #ff9800;">${highCount}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div style="font-size: 14px; color: #666;">Tests Passed</div>
+                        <div style="font-size: 36px; font-weight: bold; color: ${passRate > 80 ? '#4caf50' : '#ff9800'};">${passRate}%</div>
+                    </div>
+                </div>
+                
+                <div class="phase-status">
+                    <h2 style="margin-top: 0;">Test Phase Status</h2>
+                    ${phaseStatusHTML}
+                </div>
+                
+                <div class="footer">
+                    <p>Auto-refreshes every 30 seconds | Last updated: ${new Date().toLocaleString()}</p>
+                </div>
+            </div>
+        </body>
+        </html>`;
+}
 
 
 

@@ -1,6 +1,7 @@
 // Load environment variables
 require('dotenv').config();
 
+
 // Validate required environment variables
 const requiredEnvVars = [
     'PRIVATE_KEY',
@@ -32,7 +33,25 @@ module.exports = {
     bot: {
         checkInterval: parseInt(process.env.CHECK_INTERVAL_MS || '5000'),
         minProfitThreshold: parseFloat(process.env.MIN_PROFIT_THRESHOLD || '0.01')
-    }
+    },
+    paths: {
+            resultsDir: './security-results',
+            reportsDir: './security-reports',
+            alertsFile: './security-alerts.log',
+            monitoringDir: './monitoring',
+            dashboardDir: './dashboard'
+        },
+        testing: {
+            rateLimit: {
+                requestCount: 100,
+                timeout: 5000
+            },
+            performance: {
+                sustainedLoadDuration: 30000,
+                concurrencyLevels: [10, 25, 50, 100]
+            }
+        }
+
 };
 
 console.log('Configuration loaded successfully');

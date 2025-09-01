@@ -440,6 +440,8 @@ class SecurityMonitor {
     }
 
 
+ 
+
     // Print summary
     printSummary(results) {
         console.log('\n=== TEST SUMMARY ===');
@@ -457,11 +459,15 @@ class SecurityMonitor {
             results.tests
                 .filter(t => t.severity === 'CRITICAL')
                 .forEach(t => {
-                    console.log(`  - ${t.test}: ${t.recommendation}`);
+                    const testName = t.test || t.name || 'Unknown Test';
+                    const recommendation = t.recommendation || 'Review and fix';
+                    console.log(`  - ${testName}: ${recommendation}`);
                 });
         }
     }
+
 }
+
 
 // Run if called directly
 if (require.main === module) {
