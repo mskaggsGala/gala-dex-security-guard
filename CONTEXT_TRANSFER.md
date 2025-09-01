@@ -45,7 +45,7 @@ We built a comprehensive security monitoring system for GalaSwap DEX that tests 
 
 ## Working Directory Structure
 ```
-galaswap-trading-bot/ (local folder)
+gala-dex-security-guard/ (local folder)
 └── pushes to → galaswap-security-monitor (GitHub repo)
 ```
 
@@ -73,7 +73,7 @@ galaswap-trading-bot/ (local folder)
 
 ## Complete File Structure
 
-galaswap-trading-bot/ (local folder name)
+gala-dex-security-guard/ (local folder name)
 ├── src/
 │   ├── config.js                    # Central configuration with paths
 │   ├── dashboard.js                 # Live monitoring dashboard (port 3000)

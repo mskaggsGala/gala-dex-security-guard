@@ -1,17 +1,25 @@
 Here's an updated README that reflects your current security monitoring system:
 
 ```markdown
-# GalaSwap Security Monitor & Trading Bot
+# Gala DEX Security Guard
 
-A comprehensive security monitoring system and automated trading bot for the GalaSwap DEX, featuring multi-phase vulnerability testing, real-time monitoring, and automated security assessments.
+An institutional-grade security monitoring and testing framework for GalaSwap DEX on Hyperledger Fabric, featuring 10-phase vulnerability testing covering 200+ attack vectors, real-time monitoring, and automated security assessments.
 
 ## 🛡️ Security Monitoring Features
 
-### Four-Phase Security Testing
+### Ten-Phase Security Testing Framework
 - **Phase 1: Infrastructure** - Rate limiting, liquidity drain protection, precision handling
 - **Phase 2: Economic Security** - MEV vulnerability testing, cross-pool arbitrage detection, flash loan attack simulation
+- **Phase 3: Chaincode Security** - Smart contract vulnerabilities, access control validation
+- **Phase 4A: Time-based Attacks** - Deadline manipulation, race conditions, timestamp vulnerabilities  
 - **Phase 4B: Extended Attack Surface** - Bridge security, pool creation validation, advanced endpoint testing
-- **Phase 4C: Performance & Load** - Rate limit detection, concurrent load handling, performance degradation analysis
+- **Phase 4C: Performance & Load** - Rate limit detection, concurrent load handling, performance degradation
+- **Phase 5: Permissioned Network** - MSP security, identity management, certificate validation
+- **Phase 6: Consensus & Ordering** - Byzantine fault tolerance, consensus manipulation attempts
+- **Phase 7: Privacy & Confidentiality** - ZKP validation, private data isolation, channel security
+- **Phase 8: Compliance & Regulatory** - AML/KYC checks, transaction monitoring, regulatory compliance
+- **Phase 9: Business Logic Exploits** - Arbitrage detection, oracle manipulation, MEV protection
+- **Phase 10: Zero-Day & APT** - Supply chain security, quantum readiness, advanced persistent threats
 
 ### Enhanced Security Dashboard (NEW!)
 - **Interactive Dashboard** at http://localhost:3001 with clickable issue cards
@@ -46,8 +54,8 @@ A comprehensive security monitoring system and automated trading bot for the Gal
 ## Installation
 
 ```bash
-git clone https://github.com/mskaggsGala/galaswap-security-monitor.git
-cd galaswap-security-monitor
+git clone https://github.com/mskaggsGala/gala-dex-security-guard.git
+cd gala-dex-security-guard
 npm install
 ```
 

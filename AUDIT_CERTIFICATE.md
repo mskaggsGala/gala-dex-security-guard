@@ -2,7 +2,7 @@
 
 ## Comprehensive Security Testing Framework Verification
 
-**Project:** Galaswap Trading Bot - Hyperledger Fabric DEX  
+**Project:** Gala DEX Security Guard - Hyperledger Fabric DEX  
 **Audit Date:** 9/1/2025  
 **Audit Time:** 12:08:47 PM  
 
@@ -257,7 +257,7 @@
 
 ## 📜 Certification Statement
 
-This certificate confirms that the security testing code for the Galaswap Trading Bot has undergone comprehensive automated audit verification. The audit process has validated:
+This certificate confirms that the security testing code for the Gala DEX Security Guard has undergone comprehensive automated audit verification. The audit process has validated:
 
 1. ✅ **Legitimacy** - All tests are legitimate security tests, not malicious code
 2. ✅ **Coverage** - Tests cover the claimed attack vectors and security domains

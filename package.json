@@ -1,7 +1,7 @@
 {
-  "name": "galaswap-trading-bot",
+  "name": "gala-dex-security-guard",
   "version": "1.0.0",
-  "description": "Automated trading bot for GalaSwap V3",
+  "description": "Institutional-grade security monitoring and testing framework for GalaSwap DEX",
   "main": "index.js",
   "scripts": {
     "start": "node index.js trade",
