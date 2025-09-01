@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Test Code Audit Certificate</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .certificate {
+            background: white;
+            padding: 60px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        }
+        .seal {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            width: 100px;
+            height: 100px;
+            background: gold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        .content {
+            margin: 40px 0;
+            line-height: 1.8;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .metric-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .metric-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+        .verdict {
+            text-align: center;
+            font-size: 24px;
+            color: #28a745;
+            margin: 40px 0;
+            padding: 20px;
+            background: #d4edda;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .signature-section {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 2px solid #ddd;
+        }
+        .signature {
+            font-family: monospace;
+            font-size: 10px;
+            color: #999;
+            word-break: break-all;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate">
+        <div class="seal">✓</div>
+        <h1>Certificate of Security Audit</h1>
+        <div class="subtitle">Comprehensive Security Test Code Verification</div>
+        
+        <div class="content">
+            <p>This certifies that the security testing framework for the</p>
+            <p style="text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0;">
+                Galaswap Trading Bot - Hyperledger Fabric DEX
+            </p>
+            <p>has been thoroughly audited and verified for legitimacy, coverage, and security compliance.</p>
+            
+            <div class="metric">
+                <span class="metric-label">Audit Date:</span>
+                <span class="metric-value">9/1/2025</span>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-label">Files Audited:</span>
+                <span class="metric-value">20</span>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-label">Total Security Tests:</span>
+                <span class="metric-value">88</span>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-label">Coverage Score:</span>
+                <span class="metric-value">90.0%</span>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-label">Security Score:</span>
+                <span class="metric-value">93/100</span>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-label">Suspicious Patterns:</span>
+                <span class="metric-value">0</span>
+            </div>
+            
+            <div class="verdict">
+                PASSED - Code meets security standards
+            </div>
+            
+            <div class="signature-section">
+                <p><strong>Digital Signature:</strong></p>
+                <div class="signature">N/A</div>
+                <p style="margin-top: 20px;"><strong>Valid Until:</strong> N/A</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This certificate verifies that the security test code has been audited for:</p>
+            <p>✓ Legitimate security testing patterns | ✓ No malicious code | ✓ Comprehensive coverage</p>
+        </div>
+    </div>
+</body>
+</html>
